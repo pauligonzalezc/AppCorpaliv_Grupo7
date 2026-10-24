@@ -6,8 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import cl.duoc.appcorpaliv.ui.screens.HomeScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
+import cl.duoc.appcorpaliv.navigation.AppNavigation
 import cl.duoc.appcorpaliv.ui.theme.AppCorpaliv_Grupo7Theme
+import cl.duoc.appcorpaliv.viewmodel.MainViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -16,7 +19,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppCorpaliv_Grupo7Theme {
-                HomeScreen()
+                val viewModel : MainViewModel = viewModel()
+                val navController = rememberNavController()
+
+                AppNavigation(viewModel = viewModel, navController = navController)
             }
         }
     }
@@ -26,6 +32,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun HomeScreenPreview() {
     AppCorpaliv_Grupo7Theme {
-        HomeScreen()
+        val viewModel : MainViewModel = viewModel()
+        val navController = rememberNavController()
+
+        AppNavigation(viewModel = viewModel, navController = navController)
     }
 }
