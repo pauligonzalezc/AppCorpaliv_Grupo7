@@ -30,7 +30,7 @@ fun ImpactoScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("¡Bienvenido a Impacto")
+            Text("¡Bienvenido a Impacto!")
         }
     }
 }

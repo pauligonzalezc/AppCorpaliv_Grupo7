@@ -41,7 +41,7 @@ fun ProgramasScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("¡Bienvenido a Programas")
+            Text("¡Bienvenido a Programas!")
         }
     }
 }

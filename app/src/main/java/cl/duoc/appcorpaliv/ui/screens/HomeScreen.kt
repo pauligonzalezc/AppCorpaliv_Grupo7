@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,6 +59,21 @@ fun HomeScreen(
             // Alinea en forma horizontal en el Centro
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(containerColor = _root_ide_package_.cl.duoc.appcorpaliv.ui.theme.Purple40)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text("Tuki")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Inclusión real para personas con discapacidad múltiple")
+                }
+            }
+
             Text(
                 text = "¡Bienvenido!",
                 color = MaterialTheme.colorScheme.primary,
@@ -98,11 +116,6 @@ fun HomeScreen(
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewCompacta() {
-//    HomeScreenCompacta()
-//}
 
 
 @Preview(showBackground = true)

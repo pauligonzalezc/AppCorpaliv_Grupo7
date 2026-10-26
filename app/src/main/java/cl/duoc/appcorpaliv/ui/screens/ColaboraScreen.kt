@@ -30,7 +30,7 @@ fun ColaboraScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("¡Bienvenido a Colabora")
+            Text("¡Bienvenido a Colabora!")
         }
     }
 }

@@ -30,7 +30,7 @@ fun CatalogoScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("¡Bienvenido a Catalogo")
+            Text("¡Bienvenido a Catalogo!")
         }
     }
 }
