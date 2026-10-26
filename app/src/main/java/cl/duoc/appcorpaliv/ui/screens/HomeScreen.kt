@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -30,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -53,10 +56,8 @@ fun HomeScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .padding(16.dp),
-            // Separa cada elemento de la columna con 20dp de forma uniforme y centrado en el medio
-            verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically),
-            // Alinea en forma horizontal en el Centro
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Card(
@@ -68,48 +69,119 @@ fun HomeScreen(
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Text("Tuki")
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Text(
+                        text = "Inclusión real para personas con discapacidad múltiple",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                onClick = {viewModel.navigateTo(Screen.Problema)}
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "8 de cada 10",
+                        style = MaterialTheme.typography.titleLarge
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Inclusión real para personas con discapacidad múltiple")
+                    Text(
+                        text = "Personas con discapacidad múltiple, no tienen empleo formal en Latinoamérica",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                onClick = {viewModel.navigateTo(Screen.Programas)}
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Escuela Jan Van Dijk",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                onClick = {viewModel.navigateTo(Screen.Programas)}
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Red sociolaboral",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                onClick = {viewModel.navigateTo(Screen.Impacto)}
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Autonomía e inclusión laboral",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "18 empresas aliadas",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
 
             Text(
-                text = "¡Bienvenido!",
-                color = MaterialTheme.colorScheme.primary,
+                text = "Tú puedes ser parte del cambio",
                 style = MaterialTheme.typography.titleLarge
             )
-
-            Button(
-                onClick = { viewModel.navigateTo(Screen.Settings) },
-                // Cambia de color el boton (fondo(containerColor), texto(contentColor), diabled fondo (disabledContainerColor), disabled texto(disabledContentColor))
-                colors = ButtonDefaults.buttonColors(containerColor = _root_ide_package_.cl.duoc.appcorpaliv.ui.theme.Pink80, contentColor = _root_ide_package_.cl.duoc.appcorpaliv.ui.theme.Purple40)
-            ) {
-                Text("Presióname")
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically){
-                var checkedState by remember { mutableStateOf(false) }
-                Checkbox(
-                    checked = checkedState,
-                    onCheckedChange = {checkedState = it},
-                )
-                Text("Checkbox")
-            }
-
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo App",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp),
-                contentScale = ContentScale.Fit
+            Text(
+                text = "Con tu aporte o tu tiempo, más jóvenes llegan a un trabajo con sentido.",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(16.dp),
+                textAlign = TextAlign.Center
             )
 
-            Text("¡Bienvenido a la Pagina de Inicio (MVVM)!")
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = { viewModel.navigateTo(Screen.Settings)}){
-                Text("Ir a Configuración")
+            Row(
+                modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+                // Distributes space evenly between the buttons
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { viewModel.navigateTo(Screen.Colabora)}){
+                    Text("Donar")
+                }
+                Button(onClick = { viewModel.navigateTo(Screen.Colabora)}){
+                    Text("Voluntariado")
+                }
             }
 
         }

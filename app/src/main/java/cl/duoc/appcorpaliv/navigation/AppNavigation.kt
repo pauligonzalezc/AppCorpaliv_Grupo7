@@ -41,6 +41,7 @@ import cl.duoc.appcorpaliv.ui.screens.ColaboraScreen
 import cl.duoc.appcorpaliv.ui.screens.EquipoScreen
 import cl.duoc.appcorpaliv.ui.screens.HomeScreen
 import cl.duoc.appcorpaliv.ui.screens.ImpactoScreen
+import cl.duoc.appcorpaliv.ui.screens.ProblemaScreen
 import cl.duoc.appcorpaliv.ui.screens.ProfileScreen
 import cl.duoc.appcorpaliv.ui.screens.SettingsScreen
 import cl.duoc.appcorpaliv.ui.screens.ProgramasScreen
@@ -154,6 +155,9 @@ fun AppNavigation(
             }
             composable(route = Screen.Accesibilidad.route){
                 AccesibilidadScreen(navController = navController, viewModel = viewModel)
+            }
+            composable(route = Screen.Problema.route){
+                ProblemaScreen(navController = navController, viewModel = viewModel)
             }
         }
     }
