@@ -1,5 +1,7 @@
 package cl.duoc.appcorpaliv.navigation
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -83,17 +85,18 @@ fun AppNavigation(
     val currentRoute = backStackEntry?.destination?.route
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Corpaliv")},
-                actions = {
-                    IconButton(onClick = { viewModel.navigateTo(Screen.Accesibilidad) })
-                    { Icon(Icons.Rounded.AccessibilityNew, contentDescription = "Accesibilidad")}
-                    IconButton(onClick = { viewModel.navigateTo(Screen.Equipo) })
-                    { Icon(Icons.Rounded.AccountCircle, contentDescription = "Equipo")}
-                }
-            )
-        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+//        topBar = {
+//            TopAppBar(
+//                title = { Text("Corpaliv")},
+//                actions = {
+//                    IconButton(onClick = { viewModel.navigateTo(Screen.Accesibilidad) })
+//                    { Icon(Icons.Rounded.AccessibilityNew, contentDescription = "Accesibilidad")}
+//                    IconButton(onClick = { viewModel.navigateTo(Screen.Equipo) })
+//                    { Icon(Icons.Rounded.AccountCircle, contentDescription = "Equipo")}
+//                }
+//            )
+//        },
 
         bottomBar = {
             NavigationBar {
@@ -127,7 +130,11 @@ fun AppNavigation(
         NavHost(
             navController = navController,
             startDestination = Screen.Home.route,
-            modifier = Modifier.padding(innerPadding)
+            // consumeWindowInsets avisa a los Scaffold/TopAppBar de cada pantalla que este
+            // espacio ya se aplicó, así no vuelven a sumar la barra de estado ni la de abajo
+            modifier = Modifier
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
         ){
             composable(route = Screen.Home.route){
                 HomeScreen(navController = navController, viewModel = viewModel)

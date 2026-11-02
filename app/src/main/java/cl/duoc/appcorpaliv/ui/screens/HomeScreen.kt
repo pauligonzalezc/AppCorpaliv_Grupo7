@@ -13,10 +13,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AccessibilityNew
+import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.ArrowDownward
 import androidx.compose.material.icons.rounded.Diversity3
 import androidx.compose.material.icons.rounded.Favorite
@@ -33,6 +36,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -69,6 +73,19 @@ fun HomeScreen(
 ) {
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Corpaliv",modifier = Modifier.padding(start = 12.dp))},
+                actions = {
+                    IconButton(onClick = { viewModel.navigateTo(Screen.Accesibilidad) })
+                    { Icon(Icons.Rounded.AccessibilityNew, contentDescription = "Accesibilidad")}
+                    IconButton(onClick = { viewModel.navigateTo(Screen.Equipo) })
+                    { Icon(Icons.Rounded.AccountCircle, contentDescription = "Equipo")}
+                }
+            )
+        },
+
+
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -242,6 +259,41 @@ fun HomeScreen(
                             text = "Escuela Jan Van Dijk",
                             style = MaterialTheme.typography.titleMedium
                         )
+
+                        // Tags
+                        Row(
+                            modifier = Modifier
+                                //.fillMaxWidth()
+                                .wrapContentWidth()
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+
+                            Text(
+                                text = "Educacion",
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier
+                                    .background(Purple40, RoundedCornerShape(12.dp))
+                                    .padding(6.dp)
+                            )
+
+                            Text(
+                                text = "Comunicacion",
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier
+                                    .background(Purple40, RoundedCornerShape(12.dp))
+                                    .padding(6.dp)
+                            )
+
+                            Text(
+                                text = "Familias",
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier
+                                    .background(Purple40, RoundedCornerShape(12.dp))
+                                    .padding(6.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -282,6 +334,41 @@ fun HomeScreen(
                             text = "Red sociolaboral",
                             style = MaterialTheme.typography.titleMedium
                         )
+
+                        // Tags
+                        Row(
+                            modifier = Modifier
+                                //.fillMaxWidth()
+                                .wrapContentWidth()
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+
+                            Text(
+                                text = "Taller Protegido",
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier
+                                    .background(Purple40, RoundedCornerShape(12.dp))
+                                    .padding(6.dp)
+                            )
+
+                            Text(
+                                text = "Prácticas",
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier
+                                    .background(Purple40, RoundedCornerShape(12.dp))
+                                    .padding(6.dp)
+                            )
+
+                            Text(
+                                text = "Empresas",
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier
+                                    .background(Purple40, RoundedCornerShape(12.dp))
+                                    .padding(6.dp)
+                            )
+                        }
                     }
                 }
             }
