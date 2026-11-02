@@ -16,6 +16,7 @@ sealed class Screen(val route : String) {
     data object Voluntariado : Screen("Voluntariado")
     data object Contacto : Screen("Contacto")
     data object Confirmacion : Screen("Confirmacion")
+    data object Registros : Screen("Registros")
 
     data class Detail(val itemId : String) : Screen("detail_page/{itemId}"){
 

@@ -79,7 +79,7 @@ fun ConfirmacionScreen(
             )
 
             Text(
-                text = "Recibimos tu interés en ${registro.tipo}. El equipo te escribirá en un máximo de 3 días hábiles.",
+                text = "Recibimos tu registro. El equipo te escribirá en un máximo de 3 días hábiles.",
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
@@ -93,8 +93,8 @@ fun ConfirmacionScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Row {
-                        Text(text = "N° de registro", modifier = Modifier.weight(1f))
-                        Text(text = "RI-2026-0${registro.numero}", style = MaterialTheme.typography.titleSmall)
+                        Text(text = "Tipo", modifier = Modifier.weight(1f))
+                        Text(text = registro.tipo, style = MaterialTheme.typography.titleSmall)
                     }
                     Row {
                         Text(text = "Estado", modifier = Modifier.weight(1f))
@@ -104,10 +104,10 @@ fun ConfirmacionScreen(
             }
 
             Button(
-                onClick = { viewModel.navigateTo(Screen.Colabora, popUpTo = Screen.Home) },
+                onClick = { viewModel.navigateTo(Screen.Registros, popUpTo = Screen.Home) },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Ver más formas de colaborar")
+                Text("Ver mis registros")
             }
 
             OutlinedButton(

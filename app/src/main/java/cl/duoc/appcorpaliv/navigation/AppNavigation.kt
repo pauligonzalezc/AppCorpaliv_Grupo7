@@ -50,6 +50,7 @@ import cl.duoc.appcorpaliv.ui.screens.ProblemaScreen
 import cl.duoc.appcorpaliv.ui.screens.ProfileScreen
 import cl.duoc.appcorpaliv.ui.screens.SettingsScreen
 import cl.duoc.appcorpaliv.ui.screens.ProgramasScreen
+import cl.duoc.appcorpaliv.ui.screens.RegistrosScreen
 import cl.duoc.appcorpaliv.ui.screens.VoluntariadoScreen
 import cl.duoc.appcorpaliv.viewmodel.ColaboraViewModel
 import cl.duoc.appcorpaliv.viewmodel.MainViewModel
@@ -60,7 +61,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun AppNavigation(
     navController : NavHostController,
-    viewModel : MainViewModel = viewModel()
+    viewModel : MainViewModel = viewModel(),
+    colaboraViewModel : ColaboraViewModel
 ) {
     LaunchedEffect(key1 = Unit) {
         viewModel.navigationEvents.collectLatest { event ->
@@ -84,8 +86,7 @@ fun AppNavigation(
 
 
 
-    val colaboraViewModel : ColaboraViewModel = viewModel()
-    val rutasSinBarra = listOf(Screen.Donacion.route, Screen.Voluntariado.route, Screen.Contacto.route, Screen.Confirmacion.route)
+    val rutasSinBarra = listOf(Screen.Donacion.route, Screen.Voluntariado.route, Screen.Contacto.route, Screen.Confirmacion.route, Screen.Registros.route)
 
     val items = listOf(Screen.Home,Screen.Programas,Screen.Impacto,Screen.Catalogo,Screen.Colabora)
     // La ruta que se está mostrando; así el ítem marcado siempre coincide con la pantalla
@@ -170,6 +171,9 @@ fun AppNavigation(
             }
             composable(route = Screen.Confirmacion.route){
                 ConfirmacionScreen(navController = navController, viewModel = viewModel, colaboraViewModel = colaboraViewModel)
+            }
+            composable(route = Screen.Registros.route){
+                RegistrosScreen(navController = navController, viewModel = viewModel, colaboraViewModel = colaboraViewModel)
             }
             composable(route = Screen.Profile.route){
                 ProfileScreen(navController = navController, viewModel = viewModel)

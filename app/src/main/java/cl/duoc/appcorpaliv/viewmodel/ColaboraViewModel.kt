@@ -1,18 +1,27 @@
 package cl.duoc.appcorpaliv.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import cl.duoc.appcorpaliv.data.repository.RegistroRepository
 import cl.duoc.appcorpaliv.model.ContactoErrores
 import cl.duoc.appcorpaliv.model.ContactoUiState
 import cl.duoc.appcorpaliv.model.DonacionErrores
 import cl.duoc.appcorpaliv.model.DonacionUiState
+import cl.duoc.appcorpaliv.model.Registro
 import cl.duoc.appcorpaliv.model.RegistroUiState
 import cl.duoc.appcorpaliv.model.VoluntariadoErrores
 import cl.duoc.appcorpaliv.model.VoluntariadoUiState
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class ColaboraViewModel : ViewModel() {
+class ColaboraViewModel(
+    private val registroRepository: RegistroRepository
+) : ViewModel() {
 
     private val _donacion = MutableStateFlow(DonacionUiState())
     val donacion: StateFlow<DonacionUiState> = _donacion
@@ -25,6 +34,13 @@ class ColaboraViewModel : ViewModel() {
 
     private val _registro = MutableStateFlow(RegistroUiState())
     val registro: StateFlow<RegistroUiState> = _registro
+
+    val registros: StateFlow<List<Registro>> = registroRepository.registros
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     fun onEsSocioChange(valor: Boolean) {
         _donacion.update { it.copy(esSocio = valor) }
@@ -63,7 +79,7 @@ class ColaboraViewModel : ViewModel() {
         _donacion.update { it.copy(errores = errores) }
 
         if (!hayErrores) {
-            guardarRegistro(estadoActual.nombre, if (estadoActual.esSocio) "hacerte socio mensual" else "una donación única")
+            guardarRegistro(estadoActual.nombre, if (estadoActual.esSocio) "Socio mensual" else "Donación única")
             _donacion.value = DonacionUiState()
         }
 
@@ -130,7 +146,7 @@ class ColaboraViewModel : ViewModel() {
     }
 
     fun enviarVoluntariado() {
-        guardarRegistro(_voluntariado.value.nombre, "el voluntariado")
+        guardarRegistro(_voluntariado.value.nombre, "Voluntariado")
         _voluntariado.value = VoluntariadoUiState()
     }
 
@@ -185,6 +201,22 @@ class ColaboraViewModel : ViewModel() {
     }
 
     private fun guardarRegistro(nombre: String, tipo: String) {
-        _registro.update { RegistroUiState(nombre = nombre, tipo = tipo, numero = it.numero + 1) }
+        _registro.value = RegistroUiState(nombre = nombre, tipo = tipo)
+        viewModelScope.launch {
+            registroRepository.insertarRegistro(
+                Registro(
+                    nombre = nombre,
+                    tipo = tipo,
+                    estado = "Recibido"
+                )
+            )
+        }
+    }
+
+    class ColaboraViewModelFactory(private val registroRepository: RegistroRepository) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return ColaboraViewModel(registroRepository) as T
+        }
     }
 }
