@@ -40,6 +40,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import cl.duoc.appcorpaliv.ui.screens.AccesibilidadScreen
 import cl.duoc.appcorpaliv.ui.screens.CatalogoScreen
 import cl.duoc.appcorpaliv.ui.screens.ColaboraScreen
+import cl.duoc.appcorpaliv.ui.screens.ConfirmacionScreen
+import cl.duoc.appcorpaliv.ui.screens.ContactoScreen
+import cl.duoc.appcorpaliv.ui.screens.DonacionScreen
 import cl.duoc.appcorpaliv.ui.screens.EquipoScreen
 import cl.duoc.appcorpaliv.ui.screens.HomeScreen
 import cl.duoc.appcorpaliv.ui.screens.ImpactoScreen
@@ -47,6 +50,8 @@ import cl.duoc.appcorpaliv.ui.screens.ProblemaScreen
 import cl.duoc.appcorpaliv.ui.screens.ProfileScreen
 import cl.duoc.appcorpaliv.ui.screens.SettingsScreen
 import cl.duoc.appcorpaliv.ui.screens.ProgramasScreen
+import cl.duoc.appcorpaliv.ui.screens.VoluntariadoScreen
+import cl.duoc.appcorpaliv.viewmodel.ColaboraViewModel
 import cl.duoc.appcorpaliv.viewmodel.MainViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -79,6 +84,9 @@ fun AppNavigation(
 
 
 
+    val colaboraViewModel : ColaboraViewModel = viewModel()
+    val rutasSinBarra = listOf(Screen.Donacion.route, Screen.Voluntariado.route, Screen.Contacto.route, Screen.Confirmacion.route)
+
     val items = listOf(Screen.Home,Screen.Programas,Screen.Impacto,Screen.Catalogo,Screen.Colabora)
     // La ruta que se está mostrando; así el ítem marcado siempre coincide con la pantalla
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -99,7 +107,7 @@ fun AppNavigation(
 //        },
 
         bottomBar = {
-            NavigationBar {
+            if (currentRoute !in rutasSinBarra) NavigationBar {
                 items.forEach { screen ->
                     // Un ícono y un nombre para cada pantalla de la barra
                     val (icono, nombre) = when (screen) {
@@ -149,7 +157,19 @@ fun AppNavigation(
                 CatalogoScreen(navController = navController, viewModel = viewModel)
             }
             composable(route = Screen.Colabora.route){
-                ColaboraScreen(navController = navController, viewModel = viewModel)
+                ColaboraScreen(navController = navController, viewModel = viewModel, colaboraViewModel = colaboraViewModel)
+            }
+            composable(route = Screen.Donacion.route){
+                DonacionScreen(navController = navController, viewModel = viewModel, colaboraViewModel = colaboraViewModel)
+            }
+            composable(route = Screen.Voluntariado.route){
+                VoluntariadoScreen(navController = navController, viewModel = viewModel, colaboraViewModel = colaboraViewModel)
+            }
+            composable(route = Screen.Contacto.route){
+                ContactoScreen(navController = navController, viewModel = viewModel, colaboraViewModel = colaboraViewModel)
+            }
+            composable(route = Screen.Confirmacion.route){
+                ConfirmacionScreen(navController = navController, viewModel = viewModel, colaboraViewModel = colaboraViewModel)
             }
             composable(route = Screen.Profile.route){
                 ProfileScreen(navController = navController, viewModel = viewModel)

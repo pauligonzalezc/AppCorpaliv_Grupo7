@@ -15,9 +15,9 @@ class MainViewModel : ViewModel() {
 
     val navigationEvents : SharedFlow<NavigationEvent> = _navigationEvents.asSharedFlow()
 
-    fun navigateTo(screen : Screen) {
+    fun navigateTo(screen : Screen, popUpTo : Screen? = null, inclusive : Boolean = false) {
         viewModelScope.launch {
-            _navigationEvents.emit(NavigationEvent.NavigateTo(route = screen))
+            _navigationEvents.emit(NavigationEvent.NavigateTo(route = screen, popUpToRoute = popUpTo, inclusive = inclusive))
         }
     }
 

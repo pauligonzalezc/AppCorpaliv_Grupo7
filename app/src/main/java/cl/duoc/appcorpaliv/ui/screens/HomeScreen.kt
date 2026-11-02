@@ -471,7 +471,7 @@ fun HomeScreen(
             ) {
 
                 Button(
-                    onClick = {viewModel.navigateTo(Screen.Colabora)},
+                    onClick = {viewModel.navigateTo(Screen.Donacion)},
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(
@@ -484,7 +484,7 @@ fun HomeScreen(
                 }
 
                 Button(
-                    onClick = {viewModel.navigateTo(Screen.Colabora)},
+                    onClick = {viewModel.navigateTo(Screen.Voluntariado)},
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(
