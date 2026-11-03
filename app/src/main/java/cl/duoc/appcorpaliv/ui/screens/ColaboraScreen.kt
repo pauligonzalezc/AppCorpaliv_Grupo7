@@ -164,7 +164,10 @@ fun ColaboraScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                        onClick = { viewModel.navigateTo(Screen.Contacto) }
+                        onClick = {
+                            colaboraViewModel.onTipoChange("Alianza inclusión laboral")
+                            viewModel.navigateTo(Screen.Contacto)
+                        }
                     ) {
                         Row(
                             modifier = Modifier.padding(16.dp),

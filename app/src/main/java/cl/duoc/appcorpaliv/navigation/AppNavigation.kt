@@ -52,6 +52,7 @@ import cl.duoc.appcorpaliv.ui.screens.SettingsScreen
 import cl.duoc.appcorpaliv.ui.screens.ProgramasScreen
 import cl.duoc.appcorpaliv.ui.screens.RegistrosScreen
 import cl.duoc.appcorpaliv.ui.screens.VoluntariadoScreen
+import cl.duoc.appcorpaliv.viewmodel.CatalogoViewModel
 import cl.duoc.appcorpaliv.viewmodel.ColaboraViewModel
 import cl.duoc.appcorpaliv.viewmodel.EquipoViewModel
 import cl.duoc.appcorpaliv.viewmodel.MainViewModel
@@ -88,6 +89,7 @@ fun AppNavigation(
 
 
     val equipoViewModel : EquipoViewModel = viewModel()
+    val catalogoViewModel : CatalogoViewModel = viewModel()
     val rutasSinBarra = listOf(Screen.Donacion.route, Screen.Voluntariado.route, Screen.Contacto.route, Screen.Confirmacion.route, Screen.Registros.route, Screen.Equipo.route)
 
     val items = listOf(Screen.Home,Screen.Programas,Screen.Impacto,Screen.Catalogo,Screen.Colabora)
@@ -157,7 +159,7 @@ fun AppNavigation(
                 ImpactoScreen(navController = navController, viewModel = viewModel)
             }
             composable(route = Screen.Catalogo.route){
-                CatalogoScreen(navController = navController, viewModel = viewModel)
+                CatalogoScreen(navController = navController, viewModel = viewModel, catalogoViewModel = catalogoViewModel, colaboraViewModel = colaboraViewModel)
             }
             composable(route = Screen.Colabora.route){
                 ColaboraScreen(navController = navController, viewModel = viewModel, colaboraViewModel = colaboraViewModel)
