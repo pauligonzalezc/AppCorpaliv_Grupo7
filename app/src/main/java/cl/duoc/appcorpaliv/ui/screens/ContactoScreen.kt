@@ -1,5 +1,6 @@
 package cl.duoc.appcorpaliv.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -14,6 +16,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.Send
+import androidx.compose.material.icons.rounded.Business
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.Error
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -61,6 +68,7 @@ fun ContactoScreen(
         Column(
             modifier = Modifier
                 .padding(innerPadding)
+                .imePadding()
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
@@ -131,6 +139,7 @@ fun ContactoScreen(
                 value = estado.empresa,
                 onValueChange = colaboraViewModel::onEmpresaChange,
                 label = { Text("Empresa u organización") },
+                leadingIcon = { Icon(Icons.Rounded.Business, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -138,6 +147,12 @@ fun ContactoScreen(
                 value = estado.nombre,
                 onValueChange = colaboraViewModel::onContactoNombreChange,
                 label = { Text("Nombre de contacto *") },
+                leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
+                trailingIcon = {
+                    if (estado.errores.nombre != null) {
+                        Icon(Icons.Rounded.Error, contentDescription = "Error", tint = MaterialTheme.colorScheme.error)
+                    }
+                },
                 isError = estado.errores.nombre != null,
                 supportingText = {
                     estado.errores.nombre?.let {
@@ -151,6 +166,12 @@ fun ContactoScreen(
                 value = estado.correo,
                 onValueChange = colaboraViewModel::onContactoCorreoChange,
                 label = { Text("Correo *") },
+                leadingIcon = { Icon(Icons.Rounded.Email, contentDescription = null) },
+                trailingIcon = {
+                    if (estado.errores.correo != null) {
+                        Icon(Icons.Rounded.Error, contentDescription = "Error", tint = MaterialTheme.colorScheme.error)
+                    }
+                },
                 isError = estado.errores.correo != null,
                 supportingText = {
                     estado.errores.correo?.let {
@@ -164,6 +185,12 @@ fun ContactoScreen(
                 value = estado.mensaje,
                 onValueChange = colaboraViewModel::onMensajeChange,
                 label = { Text("Mensaje *") },
+                leadingIcon = { Icon(Icons.Rounded.Edit, contentDescription = null) },
+                trailingIcon = {
+                    if (estado.errores.mensaje != null) {
+                        Icon(Icons.Rounded.Error, contentDescription = "Error", tint = MaterialTheme.colorScheme.error)
+                    }
+                },
                 isError = estado.errores.mensaje != null,
                 supportingText = {
                     estado.errores.mensaje?.let {
@@ -182,8 +209,12 @@ fun ContactoScreen(
                 Text("Acepto que CORPALIV me contacte")
             }
 
-            estado.errores.aceptaContacto?.let {
-                Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            AnimatedVisibility(visible = estado.errores.aceptaContacto != null) {
+                Text(
+                    text = estado.errores.aceptaContacto ?: "",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
 
             Spacer(Modifier.height(4.dp))

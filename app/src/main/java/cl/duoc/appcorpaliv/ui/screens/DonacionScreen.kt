@@ -1,15 +1,22 @@
 package cl.duoc.appcorpaliv.ui.screens
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.Error
+import androidx.compose.material.icons.rounded.Payments
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -41,6 +48,11 @@ fun DonacionScreen(
     colaboraViewModel : ColaboraViewModel
 ) {
     val estado by colaboraViewModel.donacion.collectAsState()
+    val colorImpacto by animateColorAsState(
+        targetValue = if (estado.esSocio) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.tertiaryContainer,
+        animationSpec = tween(durationMillis = 500),
+        label = ""
+    )
 
     Scaffold(
         topBar = {
@@ -56,6 +68,7 @@ fun DonacionScreen(
         Column(
             modifier = Modifier
                 .padding(innerPadding)
+                .imePadding()
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
@@ -134,6 +147,12 @@ fun DonacionScreen(
                 value = estado.monto,
                 onValueChange = colaboraViewModel::onMontoChange,
                 label = { Text("Otro monto (CLP, mínimo $2.000)") },
+                leadingIcon = { Icon(Icons.Rounded.Payments, contentDescription = null) },
+                trailingIcon = {
+                    if (estado.errores.monto != null) {
+                        Icon(Icons.Rounded.Error, contentDescription = "Error", tint = MaterialTheme.colorScheme.error)
+                    }
+                },
                 isError = estado.errores.monto != null,
                 supportingText = {
                     estado.errores.monto?.let {
@@ -186,6 +205,12 @@ fun DonacionScreen(
                 value = estado.nombre,
                 onValueChange = colaboraViewModel::onDonanteNombreChange,
                 label = { Text("Nombre") },
+                leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
+                trailingIcon = {
+                    if (estado.errores.nombre != null) {
+                        Icon(Icons.Rounded.Error, contentDescription = "Error", tint = MaterialTheme.colorScheme.error)
+                    }
+                },
                 isError = estado.errores.nombre != null,
                 supportingText = {
                     estado.errores.nombre?.let {
@@ -199,6 +224,12 @@ fun DonacionScreen(
                 value = estado.correo,
                 onValueChange = colaboraViewModel::onDonanteCorreoChange,
                 label = { Text("Correo electrónico") },
+                leadingIcon = { Icon(Icons.Rounded.Email, contentDescription = null) },
+                trailingIcon = {
+                    if (estado.errores.correo != null) {
+                        Icon(Icons.Rounded.Error, contentDescription = "Error", tint = MaterialTheme.colorScheme.error)
+                    }
+                },
                 isError = estado.errores.correo != null,
                 supportingText = {
                     estado.errores.correo?.let {
@@ -210,7 +241,7 @@ fun DonacionScreen(
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+                colors = CardDefaults.cardColors(containerColor = colorImpacto)
             ) {
                 Text(
                     text = "Con $${estado.monto}${if (estado.esSocio) " al mes" else ""} ayudas a cubrir los materiales de un puesto de trabajo en ${estado.destino}.*",

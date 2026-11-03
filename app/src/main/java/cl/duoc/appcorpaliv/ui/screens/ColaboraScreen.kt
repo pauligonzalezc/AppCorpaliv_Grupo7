@@ -1,5 +1,13 @@
 package cl.duoc.appcorpaliv.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,6 +50,9 @@ fun ColaboraScreen(
     viewModel : MainViewModel = viewModel(),
     colaboraViewModel : ColaboraViewModel
 ) {
+    var visible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) { visible = true }
 
     Scaffold(
         topBar = {
@@ -67,113 +78,120 @@ fun ColaboraScreen(
                 style = MaterialTheme.typography.bodyMedium
             )
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                onClick = {
-                    colaboraViewModel.onEsSocioChange(false)
-                    viewModel.navigateTo(Screen.Donacion)
-                }
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn() + slideInVertically()
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Favorite,
-                        contentDescription = null,
-                        modifier = Modifier.size(28.dp)
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(text = "Donación única", style = MaterialTheme.typography.titleSmall)
-                        Text(text = "Un aporte cuando quieras", style = MaterialTheme.typography.bodySmall)
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                        onClick = {
+                            colaboraViewModel.onEsSocioChange(false)
+                            viewModel.navigateTo(Screen.Donacion)
+                        }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Favorite,
+                                contentDescription = null,
+                                modifier = Modifier.size(28.dp)
+                            )
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(text = "Donación única", style = MaterialTheme.typography.titleSmall)
+                                Text(text = "Un aporte cuando quieras", style = MaterialTheme.typography.bodySmall)
+                            }
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                                contentDescription = null
+                            )
+                        }
                     }
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                        contentDescription = null
-                    )
-                }
-            }
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
-                onClick = {
-                    colaboraViewModel.onEsSocioChange(true)
-                    viewModel.navigateTo(Screen.Donacion)
-                }
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.CardMembership,
-                        contentDescription = null,
-                        modifier = Modifier.size(28.dp)
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(text = "Hazte socio", style = MaterialTheme.typography.titleSmall)
-                        Text(text = "Aporte mensual que da estabilidad", style = MaterialTheme.typography.bodySmall)
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                        onClick = {
+                            colaboraViewModel.onEsSocioChange(true)
+                            viewModel.navigateTo(Screen.Donacion)
+                        }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.CardMembership,
+                                contentDescription = null,
+                                modifier = Modifier.size(28.dp)
+                            )
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(text = "Hazte socio", style = MaterialTheme.typography.titleSmall)
+                                Text(text = "Aporte mensual que da estabilidad", style = MaterialTheme.typography.bodySmall)
+                            }
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                                contentDescription = null
+                            )
+                        }
                     }
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                        contentDescription = null
-                    )
-                }
-            }
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
-                onClick = { viewModel.navigateTo(Screen.Voluntariado) }
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Handshake,
-                        contentDescription = null,
-                        modifier = Modifier.size(28.dp)
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(text = "Voluntariado", style = MaterialTheme.typography.titleSmall)
-                        Text(text = "Dona tu tiempo y tus habilidades", style = MaterialTheme.typography.bodySmall)
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+                        onClick = { viewModel.navigateTo(Screen.Voluntariado) }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Handshake,
+                                contentDescription = null,
+                                modifier = Modifier.size(28.dp)
+                            )
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(text = "Voluntariado", style = MaterialTheme.typography.titleSmall)
+                                Text(text = "Dona tu tiempo y tus habilidades", style = MaterialTheme.typography.bodySmall)
+                            }
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                                contentDescription = null
+                            )
+                        }
                     }
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                        contentDescription = null
-                    )
-                }
-            }
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                onClick = { viewModel.navigateTo(Screen.Contacto) }
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Apartment,
-                        contentDescription = null,
-                        modifier = Modifier.size(28.dp)
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(text = "Empresas y contacto", style = MaterialTheme.typography.titleSmall)
-                        Text(text = "Alianzas, RSE, Ley 21.015, compras", style = MaterialTheme.typography.bodySmall)
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                        onClick = { viewModel.navigateTo(Screen.Contacto) }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Apartment,
+                                contentDescription = null,
+                                modifier = Modifier.size(28.dp)
+                            )
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(text = "Empresas y contacto", style = MaterialTheme.typography.titleSmall)
+                                Text(text = "Alianzas, RSE, Ley 21.015, compras", style = MaterialTheme.typography.bodySmall)
+                            }
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                                contentDescription = null
+                            )
+                        }
                     }
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                        contentDescription = null
-                    )
                 }
             }
         }
