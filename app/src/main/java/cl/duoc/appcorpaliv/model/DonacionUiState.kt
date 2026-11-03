@@ -8,9 +8,3 @@ data class DonacionUiState(
     val correo: String = "",
     val errores: DonacionErrores = DonacionErrores()
 )
-
-data class DonacionErrores(
-    val monto: String? = null,
-    val nombre: String? = null,
-    val correo: String? = null
-)

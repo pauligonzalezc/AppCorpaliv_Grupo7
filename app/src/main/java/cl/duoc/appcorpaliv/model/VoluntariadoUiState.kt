@@ -16,9 +16,3 @@ data class VoluntariadoUiState(
     val foto: Uri? = null,
     val errores: VoluntariadoErrores = VoluntariadoErrores()
 )
-
-data class VoluntariadoErrores(
-    val nombre: String? = null,
-    val telefono: String? = null,
-    val comuna: String? = null
-)

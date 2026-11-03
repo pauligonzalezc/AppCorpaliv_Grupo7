@@ -9,10 +9,3 @@ data class ContactoUiState(
     val aceptaContacto: Boolean = false,
     val errores: ContactoErrores = ContactoErrores()
 )
-
-data class ContactoErrores(
-    val nombre: String? = null,
-    val correo: String? = null,
-    val mensaje: String? = null,
-    val aceptaContacto: String? = null
-)

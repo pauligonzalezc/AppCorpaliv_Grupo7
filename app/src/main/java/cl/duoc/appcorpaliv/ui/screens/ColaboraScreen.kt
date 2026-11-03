@@ -23,12 +23,10 @@ import androidx.compose.material.icons.rounded.Apartment
 import androidx.compose.material.icons.rounded.CardMembership
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Handshake
-import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -57,11 +55,7 @@ fun ColaboraScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Colabora") },
-                actions = {
-                    IconButton(onClick = { viewModel.navigateTo(Screen.Registros) })
-                    { Icon(Icons.Rounded.History, contentDescription = "Mis registros") }
-                }
+                title = { Text("Colabora") }
             )
         }
     ) { innerPadding ->

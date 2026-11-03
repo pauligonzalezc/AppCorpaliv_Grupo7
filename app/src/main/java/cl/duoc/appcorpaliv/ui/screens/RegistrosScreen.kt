@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,7 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import cl.duoc.appcorpaliv.navigation.Screen
 import cl.duoc.appcorpaliv.viewmodel.ColaboraViewModel
+import cl.duoc.appcorpaliv.viewmodel.EquipoViewModel
 import cl.duoc.appcorpaliv.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,22 +36,39 @@ import cl.duoc.appcorpaliv.viewmodel.MainViewModel
 fun RegistrosScreen(
     navController : NavController,
     viewModel : MainViewModel = viewModel(),
-    colaboraViewModel : ColaboraViewModel
+    colaboraViewModel : ColaboraViewModel,
+    equipoViewModel : EquipoViewModel
 ) {
     val listaRegistros by colaboraViewModel.registros.collectAsState()
+    val sesion by equipoViewModel.estado.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mis registros") },
+                title = { Text("Registros recibidos") },
                 navigationIcon = {
                     IconButton(onClick = { viewModel.navigateBack() })
                     { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Volver") }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        equipoViewModel.cerrarSesion()
+                        viewModel.navigateTo(Screen.Home, popUpTo = Screen.Home, inclusive = true)
+                    })
+                    { Icon(Icons.AutoMirrored.Rounded.Logout, contentDescription = "Cerrar sesión") }
                 }
             )
         }
     ) { innerPadding ->
-        if (listaRegistros.isEmpty()) {
+        if (!sesion.sesionIniciada) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                Text(text = "Debes iniciar sesión como equipo para ver los registros", modifier = Modifier.padding(24.dp))
+            }
+        } else if (listaRegistros.isEmpty()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()

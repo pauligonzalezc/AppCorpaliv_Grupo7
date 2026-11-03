@@ -53,6 +53,7 @@ import cl.duoc.appcorpaliv.ui.screens.ProgramasScreen
 import cl.duoc.appcorpaliv.ui.screens.RegistrosScreen
 import cl.duoc.appcorpaliv.ui.screens.VoluntariadoScreen
 import cl.duoc.appcorpaliv.viewmodel.ColaboraViewModel
+import cl.duoc.appcorpaliv.viewmodel.EquipoViewModel
 import cl.duoc.appcorpaliv.viewmodel.MainViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -86,7 +87,8 @@ fun AppNavigation(
 
 
 
-    val rutasSinBarra = listOf(Screen.Donacion.route, Screen.Voluntariado.route, Screen.Contacto.route, Screen.Confirmacion.route, Screen.Registros.route)
+    val equipoViewModel : EquipoViewModel = viewModel()
+    val rutasSinBarra = listOf(Screen.Donacion.route, Screen.Voluntariado.route, Screen.Contacto.route, Screen.Confirmacion.route, Screen.Registros.route, Screen.Equipo.route)
 
     val items = listOf(Screen.Home,Screen.Programas,Screen.Impacto,Screen.Catalogo,Screen.Colabora)
     // La ruta que se está mostrando; así el ítem marcado siempre coincide con la pantalla
@@ -173,7 +175,7 @@ fun AppNavigation(
                 ConfirmacionScreen(navController = navController, viewModel = viewModel, colaboraViewModel = colaboraViewModel)
             }
             composable(route = Screen.Registros.route){
-                RegistrosScreen(navController = navController, viewModel = viewModel, colaboraViewModel = colaboraViewModel)
+                RegistrosScreen(navController = navController, viewModel = viewModel, colaboraViewModel = colaboraViewModel, equipoViewModel = equipoViewModel)
             }
             composable(route = Screen.Profile.route){
                 ProfileScreen(navController = navController, viewModel = viewModel)
@@ -182,7 +184,7 @@ fun AppNavigation(
                 SettingsScreen(navController = navController, viewModel = viewModel)
             }
             composable(route = Screen.Equipo.route){
-                EquipoScreen(navController = navController, viewModel = viewModel)
+                EquipoScreen(navController = navController, viewModel = viewModel, equipoViewModel = equipoViewModel)
             }
             composable(route = Screen.Accesibilidad.route){
                 AccesibilidadScreen(navController = navController, viewModel = viewModel)
