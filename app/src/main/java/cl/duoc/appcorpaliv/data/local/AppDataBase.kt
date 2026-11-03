@@ -35,7 +35,7 @@ abstract class AppDataBase : RoomDatabase() {
                             super.onCreate(db)
                             CoroutineScope(Dispatchers.IO).launch {
                                 val dao = instance.registroDao()
-                                dao.insertarRegistro(RegistroEntity(nombre = "Javiera Soto", tipo = "Alianza inclusión laboral", estado = "Recibido"))
+                                dao.insertarRegistro(RegistroEntity(nombre = "Javiera Soto", tipo = "Alianza inclusión laboral", estado = "Nuevo"))
                             }
                         }
                     })

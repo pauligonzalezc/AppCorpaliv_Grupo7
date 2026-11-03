@@ -15,4 +15,8 @@ class RegistroRepository(
     }
 
     suspend fun insertarRegistro(registro: Registro) = registroDao.insertarRegistro(registro.toEntity())
+
+    suspend fun actualizarRegistro(registro: Registro) = registroDao.actualizarRegistro(registro.toEntity())
+
+    suspend fun eliminarRegistro(registro: Registro) = registroDao.eliminarRegistro(registro.toEntity())
 }

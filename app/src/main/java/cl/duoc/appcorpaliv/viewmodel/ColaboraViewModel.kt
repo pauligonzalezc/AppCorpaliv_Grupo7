@@ -214,9 +214,21 @@ class ColaboraViewModel(
                 Registro(
                     nombre = nombre,
                     tipo = tipo,
-                    estado = "Recibido"
+                    estado = "Nuevo"
                 )
             )
+        }
+    }
+
+    fun cambiarEstado(registro: Registro, nuevoEstado: String) {
+        viewModelScope.launch {
+            registroRepository.actualizarRegistro(registro.copy(estado = nuevoEstado))
+        }
+    }
+
+    fun eliminarRegistro(registro: Registro) {
+        viewModelScope.launch {
+            registroRepository.eliminarRegistro(registro)
         }
     }
 
