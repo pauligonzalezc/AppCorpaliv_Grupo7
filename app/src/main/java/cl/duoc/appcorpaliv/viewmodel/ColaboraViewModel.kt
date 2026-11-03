@@ -50,7 +50,7 @@ class ColaboraViewModel(
     }
 
     fun onMontoChange(valor: String) {
-        _donacion.update { it.copy(monto = valor, errores = it.errores.copy(monto = null)) }
+        _donacion.update { it.copy(monto = valor.filter { letra -> letra.isDigit() }, errores = it.errores.copy(monto = null)) }
     }
 
     fun onDestinoChange(valor: String) {
@@ -94,7 +94,7 @@ class ColaboraViewModel(
     }
 
     fun onTelefonoChange(valor: String) {
-        _voluntariado.update { it.copy(telefono = valor, errores = it.errores.copy(telefono = null)) }
+        _voluntariado.update { it.copy(telefono = valor.filter { letra -> letra.isDigit() }, errores = it.errores.copy(telefono = null)) }
     }
 
     fun onComunaChange(valor: String) {
