@@ -1,5 +1,7 @@
 package cl.duoc.appcorpaliv.model
 
+import android.net.Uri
+
 data class VoluntariadoUiState(
     val nombre: String = "",
     val telefono: String = "",
@@ -11,6 +13,7 @@ data class VoluntariadoUiState(
     val mananas: Boolean = false,
     val tardes: Boolean = false,
     val finesDeSemana: Boolean = false,
+    val foto: Uri? = null,
     val errores: VoluntariadoErrores = VoluntariadoErrores()
 )
 

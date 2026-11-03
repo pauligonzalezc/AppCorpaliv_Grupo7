@@ -1,5 +1,6 @@
 package cl.duoc.appcorpaliv.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -22,6 +23,8 @@ import kotlinx.coroutines.launch
 class ColaboraViewModel(
     private val registroRepository: RegistroRepository
 ) : ViewModel() {
+
+    private val regexCorreo = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
 
     private val _donacion = MutableStateFlow(DonacionUiState())
     val donacion: StateFlow<DonacionUiState> = _donacion
@@ -67,7 +70,7 @@ class ColaboraViewModel(
         val errores = DonacionErrores(
             monto = if ((estadoActual.monto.toIntOrNull() ?: 0) < 2000) "Mínimo $2.000" else null,
             nombre = if (estadoActual.nombre.isBlank()) "Campo obligatorio" else null,
-            correo = if (!estadoActual.correo.contains("@")) "Correo inválido" else null
+            correo = if (!estadoActual.correo.matches(regexCorreo)) "Correo inválido, por ejemplo: nombre@correo.cl" else null
         )
 
         val hayErrores = listOfNotNull(
@@ -126,6 +129,10 @@ class ColaboraViewModel(
         _voluntariado.update { it.copy(finesDeSemana = valor) }
     }
 
+    fun onFotoChange(valor: Uri?) {
+        _voluntariado.update { it.copy(foto = valor) }
+    }
+
     fun validarVoluntariado(): Boolean {
         val estadoActual = _voluntariado.value
         val errores = VoluntariadoErrores(
@@ -178,7 +185,7 @@ class ColaboraViewModel(
         val estadoActual = _contacto.value
         val errores = ContactoErrores(
             nombre = if (estadoActual.nombre.isBlank()) "Campo obligatorio" else null,
-            correo = if (!estadoActual.correo.contains("@")) "Correo inválido" else null,
+            correo = if (!estadoActual.correo.matches(regexCorreo)) "Correo inválido, por ejemplo: nombre@correo.cl" else null,
             mensaje = if (estadoActual.mensaje.length < 20) "Escribe al menos 20 caracteres (llevas ${estadoActual.mensaje.length})" else null,
             aceptaContacto = if (!estadoActual.aceptaContacto) "Debes aceptar para continuar" else null
         )
