@@ -1,25 +1,23 @@
 package cl.duoc.appcorpaliv.ui.screens
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Handyman
-import androidx.compose.material.icons.rounded.Redeem
 import androidx.compose.material.icons.rounded.RequestQuote
-import androidx.compose.material.icons.rounded.ShoppingBag
 import androidx.compose.material.icons.rounded.Verified
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -98,6 +96,7 @@ fun CatalogoScreen(
             LazyVerticalGrid(
                 columns = GridCells.Fixed(columnas),
                 modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(bottom = 88.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -106,29 +105,14 @@ fun CatalogoScreen(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
                     ) {
-                        Box(
+                        Image(
+                            painter = painterResource(id = producto.imagen),
+                            contentDescription = producto.nombre,
+                            contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(80.dp)
-                                .background(
-                                    when (producto.categoria) {
-                                        "Servicios" -> MaterialTheme.colorScheme.tertiaryContainer
-                                        "Regalos" -> MaterialTheme.colorScheme.secondaryContainer
-                                        else -> MaterialTheme.colorScheme.primaryContainer
-                                    }
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = when (producto.categoria) {
-                                    "Servicios" -> Icons.Rounded.Handyman
-                                    "Regalos" -> Icons.Rounded.Redeem
-                                    else -> Icons.Rounded.ShoppingBag
-                                },
-                                contentDescription = null,
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
+                                .height(160.dp)
+                        )
                         Column(modifier = Modifier.padding(12.dp)) {
                             Text(text = producto.nombre, style = MaterialTheme.typography.titleSmall)
                             Text(text = producto.precio, style = MaterialTheme.typography.bodySmall)
@@ -136,12 +120,6 @@ fun CatalogoScreen(
                     }
                 }
             }
-
-            Text(
-                text = "* Precios de referencia. No hay pago dentro de la app: toca Cotizar y el equipo te contactará.",
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(bottom = 80.dp)
-            )
         }
     }
 }

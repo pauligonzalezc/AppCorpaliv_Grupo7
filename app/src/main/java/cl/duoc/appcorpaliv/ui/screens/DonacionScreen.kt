@@ -248,7 +248,7 @@ fun DonacionScreen(
                 colors = CardDefaults.cardColors(containerColor = colorImpacto)
             ) {
                 Text(
-                    text = "Con $${estado.monto}${if (estado.esSocio) " al mes" else ""} ayudas a cubrir los materiales de un puesto de trabajo en ${estado.destino}.*",
+                    text = "Con $${estado.monto}${if (estado.esSocio) " al mes" else ""} ayudas a cubrir los materiales de un puesto de trabajo en ${estado.destino}.",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(16.dp)
                 )

@@ -1,5 +1,13 @@
 package cl.duoc.appcorpaliv.ui.screens
 
+import androidx.compose.foundation.Image
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.PlayCircle
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
+import cl.duoc.appcorpaliv.R
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -11,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.PhotoCamera
-import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,6 +56,7 @@ fun ImpactoScreen(
     navController : NavController,
     viewModel : MainViewModel = viewModel()
 ) {
+    val uriHandler = LocalUriHandler.current
     var mostrarGrafico by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { mostrarGrafico = true }
@@ -93,7 +101,7 @@ fun ImpactoScreen(
                     ) {
 
                         Text(
-                            text = "126*",
+                            text = "126",
                             style = MaterialTheme.typography.titleLarge
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -115,7 +123,7 @@ fun ImpactoScreen(
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            text = "34*",
+                            text = "34",
                             style = MaterialTheme.typography.titleLarge
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -142,7 +150,7 @@ fun ImpactoScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(text = "Inserciones laborales", style = MaterialTheme.typography.titleSmall)
-                        Text(text = "por año*", style = MaterialTheme.typography.bodySmall)
+                        Text(text = "por año", style = MaterialTheme.typography.bodySmall)
                     }
                     Row(
                         modifier = Modifier
@@ -209,6 +217,44 @@ fun ImpactoScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                onClick = { uriHandler.openUri("https://www.youtube.com/watch?v=W0N8Ch-i-X0") }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.impacto),
+                        contentDescription = "Video de CORPALIV",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                    Icon(
+                        imageVector = Icons.Rounded.PlayCircle,
+                        contentDescription = "Reproducir video",
+                        tint = Color.White,
+                        modifier = Modifier.size(56.dp)
+                    )
+                }
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(text = "Conoce nuestro trabajo", style = MaterialTheme.typography.titleSmall)
+                    Text(text = "Toca para ver el video en YouTube.", style = MaterialTheme.typography.bodySmall)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -219,14 +265,14 @@ fun ImpactoScreen(
                             .background(MaterialTheme.colorScheme.tertiaryContainer),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Rounded.PlayArrow, contentDescription = null, modifier = Modifier.size(32.dp))
+                        Icon(Icons.Rounded.Person, contentDescription = null, modifier = Modifier.size(32.dp))
                     }
                     Column(
                         modifier = Modifier.padding(12.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text(text = "«Ahora tengo mi propio horario»", style = MaterialTheme.typography.titleSmall)
-                        Text(text = "Tomás*, 24 años. De la práctica a un contrato en una empresa de logística.", style = MaterialTheme.typography.bodySmall)
+                        Text(text = "Tomás, 24 años. De la práctica a un contrato en una empresa de logística.", style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
@@ -259,11 +305,7 @@ fun ImpactoScreen(
                 }
             }
 
-            Text(
-                text = "* Datos de ejemplo. Las personas son ficticias o anonimizadas.",
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(16.dp)
-            )
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

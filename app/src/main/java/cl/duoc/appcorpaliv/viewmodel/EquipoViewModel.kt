@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.update
 
 class EquipoViewModel : ViewModel() {
 
-    private val correoEquipo = "equipo@demo.cl"
-    private val claveEquipo = "Corpaliv2026"
+    private val correoEquipo = "admin@corpaliv.cl"
+    private val claveEquipo = "admin1234"
     private val regexCorreo = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
 
     private val _estado = MutableStateFlow(LoginUiState())

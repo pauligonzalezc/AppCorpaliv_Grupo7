@@ -1,5 +1,9 @@
 package cl.duoc.appcorpaliv.ui.screens
 
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import cl.duoc.appcorpaliv.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -81,11 +85,13 @@ fun ProgramasScreen(
                     .padding(16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
             ) {
-                Box(
+                Image(
+                    painter = painterResource(id = R.drawable.escuela),
+                    contentDescription = "Escuela Especial Jan Van Dijk",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(148.dp)
-                        .background(Purple40)
                 )
                 Column(
                     modifier = Modifier.padding(16.dp)
@@ -116,11 +122,13 @@ fun ProgramasScreen(
                     .padding(16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
             ) {
-                Box(
+                Image(
+                    painter = painterResource(id = R.drawable.alba_lab),
+                    contentDescription = "Taller Protegido de Alba Lab",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(148.dp)
-                        .background(Purple40)
                 )
                 Column(
                     modifier = Modifier.padding(16.dp)

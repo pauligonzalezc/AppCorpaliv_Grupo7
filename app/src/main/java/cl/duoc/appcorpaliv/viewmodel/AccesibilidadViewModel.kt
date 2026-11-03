@@ -26,10 +26,7 @@ class AccesibilidadViewModel(application: Application) : AndroidViewModel(applic
     fun cargarPreferencias() {
         viewModelScope.launch {
             _estado.value = AccesibilidadUiState(
-                tamanoTexto = accesibilidadDataStore.obtenerTamanoTexto().first() ?: 1f,
-                altoContraste = accesibilidadDataStore.obtenerAltoContraste().first() ?: false,
-                leerEnVozAlta = accesibilidadDataStore.obtenerLeerEnVozAlta().first() ?: false,
-                reducirAnimaciones = accesibilidadDataStore.obtenerReducirAnimaciones().first() ?: false
+                tamanoTexto = accesibilidadDataStore.obtenerTamanoTexto().first() ?: 1f
             )
         }
     }
@@ -38,27 +35,9 @@ class AccesibilidadViewModel(application: Application) : AndroidViewModel(applic
         _estado.update { it.copy(tamanoTexto = valor) }
     }
 
-    fun onAltoContrasteChange(valor: Boolean) {
-        _estado.update { it.copy(altoContraste = valor) }
-    }
-
-    fun onLeerEnVozAltaChange(valor: Boolean) {
-        _estado.update { it.copy(leerEnVozAlta = valor) }
-    }
-
-    fun onReducirAnimacionesChange(valor: Boolean) {
-        _estado.update { it.copy(reducirAnimaciones = valor) }
-    }
-
     fun guardarPreferencias() {
         viewModelScope.launch {
-            val estadoActual = _estado.value
-            accesibilidadDataStore.guardarPreferencias(
-                tamanoTexto = estadoActual.tamanoTexto,
-                altoContraste = estadoActual.altoContraste,
-                leerEnVozAlta = estadoActual.leerEnVozAlta,
-                reducirAnimaciones = estadoActual.reducirAnimaciones
-            )
+            accesibilidadDataStore.guardarTamanoTexto(_estado.value.tamanoTexto)
 
             _estado.update { it.copy(mostrarMensaje = true) }
 

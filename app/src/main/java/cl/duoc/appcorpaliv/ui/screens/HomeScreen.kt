@@ -2,6 +2,7 @@ package cl.duoc.appcorpaliv.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -75,7 +75,15 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Corpaliv",modifier = Modifier.padding(start = 12.dp))},
+                title = {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo),
+                        contentDescription = "Corpaliv",
+                        modifier = Modifier
+                            .padding(start = 12.dp)
+                            .height(36.dp)
+                    )
+                },
                 actions = {
                     IconButton(onClick = { viewModel.navigateTo(Screen.Accesibilidad) })
                     { Icon(Icons.Rounded.AccessibilityNew, contentDescription = "Accesibilidad")}
@@ -103,13 +111,26 @@ fun HomeScreen(
                     .padding(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Purple40)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
                 ) {
-                    Spacer(modifier = Modifier.height(64.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.inicio),
+                        contentDescription = "Jóvenes de Alba Lab trabajando",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
                     Text(
                         text = "Inclusión real para personas con discapacidad múltiple",
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White,
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .fillMaxWidth()
+                            .background(Color.Black.copy(alpha = 0.45f))
+                            .padding(16.dp)
                     )
                 }
             }
@@ -263,8 +284,7 @@ fun HomeScreen(
                         // Tags
                         Row(
                             modifier = Modifier
-                                //.fillMaxWidth()
-                                .wrapContentWidth()
+                                .horizontalScroll(rememberScrollState())
                                 .padding(vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -273,6 +293,7 @@ fun HomeScreen(
                             Text(
                                 text = "Educacion",
                                 style = MaterialTheme.typography.labelSmall,
+                                maxLines = 1,
                                 modifier = Modifier
                                     .background(Purple40, RoundedCornerShape(12.dp))
                                     .padding(6.dp)
@@ -281,6 +302,7 @@ fun HomeScreen(
                             Text(
                                 text = "Comunicacion",
                                 style = MaterialTheme.typography.labelSmall,
+                                maxLines = 1,
                                 modifier = Modifier
                                     .background(Purple40, RoundedCornerShape(12.dp))
                                     .padding(6.dp)
@@ -289,6 +311,7 @@ fun HomeScreen(
                             Text(
                                 text = "Familias",
                                 style = MaterialTheme.typography.labelSmall,
+                                maxLines = 1,
                                 modifier = Modifier
                                     .background(Purple40, RoundedCornerShape(12.dp))
                                     .padding(6.dp)
@@ -338,8 +361,7 @@ fun HomeScreen(
                         // Tags
                         Row(
                             modifier = Modifier
-                                //.fillMaxWidth()
-                                .wrapContentWidth()
+                                .horizontalScroll(rememberScrollState())
                                 .padding(vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -348,6 +370,7 @@ fun HomeScreen(
                             Text(
                                 text = "Taller Protegido",
                                 style = MaterialTheme.typography.labelSmall,
+                                maxLines = 1,
                                 modifier = Modifier
                                     .background(Purple40, RoundedCornerShape(12.dp))
                                     .padding(6.dp)
@@ -356,6 +379,7 @@ fun HomeScreen(
                             Text(
                                 text = "Prácticas",
                                 style = MaterialTheme.typography.labelSmall,
+                                maxLines = 1,
                                 modifier = Modifier
                                     .background(Purple40, RoundedCornerShape(12.dp))
                                     .padding(6.dp)
@@ -364,6 +388,7 @@ fun HomeScreen(
                             Text(
                                 text = "Empresas",
                                 style = MaterialTheme.typography.labelSmall,
+                                maxLines = 1,
                                 modifier = Modifier
                                     .background(Purple40, RoundedCornerShape(12.dp))
                                     .padding(6.dp)

@@ -22,7 +22,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -117,49 +116,6 @@ fun AccesibilidadScreen(
                                 .padding(horizontal = 12.dp)
                         )
                         Text(text = "A", fontSize = 22.sp)
-                    }
-                }
-            }
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(text = "Alto contraste", style = MaterialTheme.typography.titleSmall)
-                            Text(text = "Colores con contraste 7:1", style = MaterialTheme.typography.bodySmall)
-                        }
-                        Switch(
-                            checked = estado.altoContraste,
-                            onCheckedChange = accesibilidadViewModel::onAltoContrasteChange
-                        )
-                    }
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(text = "Leer en voz alta", style = MaterialTheme.typography.titleSmall)
-                            Text(text = "Botón «Escuchar» en los textos", style = MaterialTheme.typography.bodySmall)
-                        }
-                        Switch(
-                            checked = estado.leerEnVozAlta,
-                            onCheckedChange = accesibilidadViewModel::onLeerEnVozAltaChange
-                        )
-                    }
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(text = "Reducir animaciones", style = MaterialTheme.typography.titleSmall)
-                            Text(text = "Transiciones más simples", style = MaterialTheme.typography.bodySmall)
-                        }
-                        Switch(
-                            checked = estado.reducirAnimaciones,
-                            onCheckedChange = accesibilidadViewModel::onReducirAnimacionesChange
-                        )
                     }
                 }
             }
