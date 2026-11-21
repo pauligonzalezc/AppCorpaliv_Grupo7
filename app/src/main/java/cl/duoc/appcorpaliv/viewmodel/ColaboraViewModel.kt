@@ -1,10 +1,10 @@
 package cl.duoc.appcorpaliv.viewmodel
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import cl.duoc.appcorpaliv.data.repository.RegistroRepository
+import cl.duoc.appcorpaliv.model.Adjunto
 import cl.duoc.appcorpaliv.model.ContactoErrores
 import cl.duoc.appcorpaliv.model.ContactoUiState
 import cl.duoc.appcorpaliv.model.DonacionErrores
@@ -16,6 +16,7 @@ import cl.duoc.appcorpaliv.model.VoluntariadoUiState
 import cl.duoc.appcorpaliv.utils.Validaciones
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -45,6 +46,37 @@ class ColaboraViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    // null = pestaña Todos, si no -> "Nuevo", "Contactado", "Cerrado"
+    private val _filtroEstado = MutableStateFlow<String?>(null)
+    val filtroEstado: StateFlow<String?> = _filtroEstado
+
+    val registrosFiltrados: StateFlow<List<Registro>> = combine(registroRepository.registros, _filtroEstado) { lista, filtro ->
+        if (filtro == null) lista else lista.filter { it.estado == filtro }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    private val _registroSeleccionadoId = MutableStateFlow<Int?>(null)
+
+    // se recalcula con la lista, el detalle refleja al tiro un cambio de estado
+    val registroSeleccionado: StateFlow<Registro?> = combine(registroRepository.registros, _registroSeleccionadoId) { lista, id ->
+        lista.firstOrNull { it.id == id }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
+
+    fun onFiltroEstadoChange(estado: String?) {
+        _filtroEstado.value = estado
+    }
+
+    fun seleccionarRegistro(registro: Registro) {
+        _registroSeleccionadoId.value = registro.id
+    }
 
     fun onEsSocioChange(valor: Boolean) {
         _donacion.update { it.copy(esSocio = valor) }
@@ -89,7 +121,16 @@ class ColaboraViewModel(
         _donacion.update { it.copy(errores = errores) }
 
         if (!hayErrores) {
-            guardarRegistro(estadoActual.nombre, estadoActual.apellido, if (estadoActual.esSocio) "Socio mensual" else "Donación única")
+            guardarRegistro(
+                nombre = estadoActual.nombre,
+                apellido = estadoActual.apellido,
+                tipo = if (estadoActual.esSocio) "Socio mensual" else "Donación única",
+                correo = estadoActual.correo.trim(),
+                detalle = listOf(
+                    "Monto: $${estadoActual.monto}${if (estadoActual.esSocio) " al mes" else ""}",
+                    "Destino: ${estadoActual.destino}"
+                ).joinToString("\n")
+            )
             _donacion.value = DonacionUiState()
         }
 
@@ -140,8 +181,8 @@ class ColaboraViewModel(
         _voluntariado.update { it.copy(finesDeSemana = valor, errores = it.errores.copy(disponibilidad = null)) }
     }
 
-    fun onFotoChange(valor: Uri?) {
-        _voluntariado.update { it.copy(foto = valor) }
+    fun onAdjuntoChange(valor: Adjunto?) {
+        _voluntariado.update { it.copy(adjunto = valor) }
     }
 
     fun validarVoluntariado(): Boolean {
@@ -170,7 +211,30 @@ class ColaboraViewModel(
     }
 
     fun enviarVoluntariado() {
-        guardarRegistro(_voluntariado.value.nombre, _voluntariado.value.apellido, "Voluntariado")
+        val estadoActual = _voluntariado.value
+        val intereses = listOfNotNull(
+            "Talleres".takeIf { estadoActual.talleres },
+            "Eventos".takeIf { estadoActual.eventos },
+            "Comunicaciones".takeIf { estadoActual.comunicaciones },
+            "Mentoría laboral".takeIf { estadoActual.mentoria }
+        )
+        val disponibilidad = listOfNotNull(
+            "Mañanas".takeIf { estadoActual.mananas },
+            "Tardes".takeIf { estadoActual.tardes },
+            "Fines de semana".takeIf { estadoActual.finesDeSemana }
+        )
+        guardarRegistro(
+            nombre = estadoActual.nombre,
+            apellido = estadoActual.apellido,
+            tipo = "Voluntariado",
+            telefono = "+56 ${estadoActual.telefono}",
+            detalle = listOf(
+                "Comuna: ${estadoActual.comuna.trim()}",
+                "Intereses: ${intereses.joinToString(", ")}",
+                "Disponibilidad: ${disponibilidad.joinToString(", ")}"
+            ).joinToString("\n"),
+            adjunto = estadoActual.adjunto
+        )
         _voluntariado.value = VoluntariadoUiState()
     }
 
@@ -223,21 +287,42 @@ class ColaboraViewModel(
         _contacto.update { it.copy(errores = errores) }
 
         if (!hayErrores) {
-            guardarRegistro(estadoActual.nombre, estadoActual.apellido, estadoActual.tipo)
+            guardarRegistro(
+                nombre = estadoActual.nombre,
+                apellido = estadoActual.apellido,
+                tipo = estadoActual.tipo,
+                correo = estadoActual.correo.trim(),
+                detalle = listOfNotNull(
+                    estadoActual.empresa.trim().takeIf { it.isNotEmpty() }?.let { "Empresa: $it" },
+                    "Mensaje: ${estadoActual.mensaje.trim()}"
+                ).joinToString("\n")
+            )
             _contacto.value = ContactoUiState()
         }
 
         return !hayErrores
     }
 
-    private fun guardarRegistro(nombre: String, apellido: String, tipo: String) {
+    private fun guardarRegistro(
+        nombre: String,
+        apellido: String,
+        tipo: String,
+        correo: String = "",
+        telefono: String = "",
+        detalle: String = "",
+        adjunto: Adjunto? = null
+    ) {
         _registro.value = RegistroUiState(nombre = nombre.trim(), tipo = tipo)
         viewModelScope.launch {
             registroRepository.insertarRegistro(
                 Registro(
                     nombre = "${nombre.trim()} ${apellido.trim()}",
                     tipo = tipo,
-                    estado = "Nuevo"
+                    estado = "Nuevo",
+                    correo = correo,
+                    telefono = telefono,
+                    detalle = detalle,
+                    adjunto = adjunto
                 )
             )
         }

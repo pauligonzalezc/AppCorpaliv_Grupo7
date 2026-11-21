@@ -38,6 +38,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import cl.duoc.appcorpaliv.ui.screens.AccesibilidadScreen
+import cl.duoc.appcorpaliv.ui.screens.CamaraScreen
 import cl.duoc.appcorpaliv.ui.screens.CatalogoScreen
 import cl.duoc.appcorpaliv.ui.screens.ColaboraScreen
 import cl.duoc.appcorpaliv.ui.screens.ConfirmacionScreen
@@ -50,6 +51,7 @@ import cl.duoc.appcorpaliv.ui.screens.ProblemaScreen
 import cl.duoc.appcorpaliv.ui.screens.ProfileScreen
 import cl.duoc.appcorpaliv.ui.screens.SettingsScreen
 import cl.duoc.appcorpaliv.ui.screens.ProgramasScreen
+import cl.duoc.appcorpaliv.ui.screens.RegistroDetalleScreen
 import cl.duoc.appcorpaliv.ui.screens.RegistrosScreen
 import cl.duoc.appcorpaliv.ui.screens.VoluntariadoScreen
 import cl.duoc.appcorpaliv.viewmodel.AccesibilidadViewModel
@@ -92,7 +94,7 @@ fun AppNavigation(
 
     val equipoViewModel : EquipoViewModel = viewModel()
     val catalogoViewModel : CatalogoViewModel = viewModel()
-    val rutasSinBarra = listOf(Screen.Donacion.route, Screen.Voluntariado.route, Screen.Contacto.route, Screen.Confirmacion.route, Screen.Registros.route, Screen.Equipo.route, Screen.Accesibilidad.route)
+    val rutasSinBarra = listOf(Screen.Donacion.route, Screen.Voluntariado.route, Screen.Contacto.route, Screen.Confirmacion.route, Screen.Registros.route, Screen.RegistroDetalle.route, Screen.Camara.route, Screen.Equipo.route, Screen.Accesibilidad.route)
 
     val items = listOf(Screen.Home,Screen.Programas,Screen.Impacto,Screen.Catalogo,Screen.Colabora)
     // La ruta que se está mostrando; así el ítem marcado siempre coincide con la pantalla
@@ -180,6 +182,12 @@ fun AppNavigation(
             }
             composable(route = Screen.Registros.route){
                 RegistrosScreen(navController = navController, viewModel = viewModel, colaboraViewModel = colaboraViewModel, equipoViewModel = equipoViewModel)
+            }
+            composable(route = Screen.RegistroDetalle.route){
+                RegistroDetalleScreen(navController = navController, viewModel = viewModel, colaboraViewModel = colaboraViewModel, equipoViewModel = equipoViewModel)
+            }
+            composable(route = Screen.Camara.route){
+                CamaraScreen(navController = navController, viewModel = viewModel, colaboraViewModel = colaboraViewModel)
             }
             composable(route = Screen.Profile.route){
                 ProfileScreen(navController = navController, viewModel = viewModel)

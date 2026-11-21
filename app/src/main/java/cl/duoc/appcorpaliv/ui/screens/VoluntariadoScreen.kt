@@ -1,7 +1,6 @@
 package cl.duoc.appcorpaliv.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -21,8 +20,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.AddAPhoto
+import androidx.compose.material.icons.rounded.AttachFile
+import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.PhotoCamera
-import androidx.compose.material.icons.rounded.PhotoLibrary
 import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material.icons.rounded.LocationOn
@@ -31,7 +31,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,7 +45,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -58,14 +57,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import cl.duoc.appcorpaliv.model.Adjunto
 import cl.duoc.appcorpaliv.navigation.Screen
+import cl.duoc.appcorpaliv.utils.ArchivosAdjuntos
 import cl.duoc.appcorpaliv.viewmodel.ColaboraViewModel
 import cl.duoc.appcorpaliv.viewmodel.MainViewModel
 import coil.compose.AsyncImage
-import java.io.File
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,17 +77,17 @@ fun VoluntariadoScreen(
     val estado by colaboraViewModel.voluntariado.collectAsState()
     var paso by rememberSaveable { mutableStateOf(1) }
     val context = LocalContext.current
-    var uriCamara by remember { mutableStateOf<Uri?>(null) }
+    val scope = rememberCoroutineScope()
+    var errorAdjunto by rememberSaveable { mutableStateOf<String?>(null) }
 
-    val galeriaLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    // adjuntar archivo: imagen o pdf
+    val archivoLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
-            colaboraViewModel.onFotoChange(uri)
-        }
-    }
-
-    val camaraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { exito ->
-        if (exito) {
-            colaboraViewModel.onFotoChange(uriCamara)
+            scope.launch {
+                val adjunto = ArchivosAdjuntos.copiarDocumento(context, uri)
+                errorAdjunto = if (adjunto == null) "No se pudo adjuntar el archivo" else null
+                if (adjunto != null) colaboraViewModel.onAdjuntoChange(adjunto)
+            }
         }
     }
 
@@ -206,37 +206,13 @@ fun VoluntariadoScreen(
 
                     Text(text = "¿En qué te gustaría ayudar? *", style = MaterialTheme.typography.titleMedium)
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = estado.talleres,
-                            onCheckedChange = colaboraViewModel::onTalleresChange
-                        )
-                        Text("Talleres")
-                    }
+                    OpcionCheckbox(texto = "Talleres", marcado = estado.talleres, onCambio = colaboraViewModel::onTalleresChange)
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = estado.eventos,
-                            onCheckedChange = colaboraViewModel::onEventosChange
-                        )
-                        Text("Eventos")
-                    }
+                    OpcionCheckbox(texto = "Eventos", marcado = estado.eventos, onCambio = colaboraViewModel::onEventosChange)
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = estado.comunicaciones,
-                            onCheckedChange = colaboraViewModel::onComunicacionesChange
-                        )
-                        Text("Comunicaciones")
-                    }
+                    OpcionCheckbox(texto = "Comunicaciones", marcado = estado.comunicaciones, onCambio = colaboraViewModel::onComunicacionesChange)
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = estado.mentoria,
-                            onCheckedChange = colaboraViewModel::onMentoriaChange
-                        )
-                        Text("Mentoría laboral")
-                    }
+                    OpcionCheckbox(texto = "Mentoría laboral", marcado = estado.mentoria, onCambio = colaboraViewModel::onMentoriaChange)
 
                     AnimatedVisibility(visible = estado.errores.intereses != null) {
                         Text(
@@ -248,29 +224,11 @@ fun VoluntariadoScreen(
 
                     Text(text = "Disponibilidad *", style = MaterialTheme.typography.titleMedium)
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = estado.mananas,
-                            onCheckedChange = colaboraViewModel::onMananasChange
-                        )
-                        Text("Mañanas")
-                    }
+                    OpcionCheckbox(texto = "Mañanas", marcado = estado.mananas, onCambio = colaboraViewModel::onMananasChange)
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = estado.tardes,
-                            onCheckedChange = colaboraViewModel::onTardesChange
-                        )
-                        Text("Tardes")
-                    }
+                    OpcionCheckbox(texto = "Tardes", marcado = estado.tardes, onCambio = colaboraViewModel::onTardesChange)
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = estado.finesDeSemana,
-                            onCheckedChange = colaboraViewModel::onFinesDeSemanaChange
-                        )
-                        Text("Fines de semana")
-                    }
+                    OpcionCheckbox(texto = "Fines de semana", marcado = estado.finesDeSemana, onCambio = colaboraViewModel::onFinesDeSemanaChange)
 
                     AnimatedVisibility(visible = estado.errores.disponibilidad != null) {
                         Text(
@@ -293,35 +251,28 @@ fun VoluntariadoScreen(
                                 Spacer(Modifier.width(12.dp))
                                 Column {
                                     Text(text = "Agregar foto o CV", style = MaterialTheme.typography.titleSmall)
-                                    Text(text = "Cámara o galería · opcional", style = MaterialTheme.typography.bodySmall)
+                                    Text(text = "Toma una foto o adjunta una imagen o PDF · opcional", style = MaterialTheme.typography.bodySmall)
                                 }
                             }
 
-                            AnimatedVisibility(visible = estado.foto != null) {
-                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    AsyncImage(
-                                        model = estado.foto,
-                                        contentDescription = "Foto adjunta",
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(160.dp)
-                                            .clip(RoundedCornerShape(12.dp))
-                                    )
-                                    TextButton(onClick = { colaboraViewModel.onFotoChange(null) }) {
-                                        Text("Quitar foto")
+                            AnimatedVisibility(visible = estado.adjunto != null) {
+                                estado.adjunto?.let { adjunto ->
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        VistaPreviaAdjunto(adjunto)
+                                        TextButton(onClick = { colaboraViewModel.onAdjuntoChange(null) }) {
+                                            Text("Quitar adjunto")
+                                        }
                                     }
                                 }
                             }
 
+                            errorAdjunto?.let {
+                                Text(text = it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                            }
+
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 OutlinedButton(
-                                    onClick = {
-                                        val archivo = File(context.cacheDir, "foto_${System.currentTimeMillis()}.jpg")
-                                        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", archivo)
-                                        uriCamara = uri
-                                        camaraLauncher.launch(uri)
-                                    },
+                                    onClick = { viewModel.navigateTo(Screen.Camara) },
                                     modifier = Modifier.weight(1f)
                                 ) {
                                     Icon(Icons.Rounded.PhotoCamera, contentDescription = null)
@@ -329,12 +280,12 @@ fun VoluntariadoScreen(
                                     Text("Cámara")
                                 }
                                 OutlinedButton(
-                                    onClick = { galeriaLauncher.launch("image/*") },
+                                    onClick = { archivoLauncher.launch(arrayOf("image/*", "application/pdf")) },
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    Icon(Icons.Rounded.PhotoLibrary, contentDescription = null)
+                                    Icon(Icons.Rounded.AttachFile, contentDescription = null)
                                     Spacer(Modifier.width(ButtonDefaults.IconSpacing))
-                                    Text("Galería")
+                                    Text("Adjuntar")
                                 }
                             }
                         }
@@ -385,21 +336,11 @@ fun VoluntariadoScreen(
                             if (estado.finesDeSemana) {
                                 Text("- Fines de semana")
                             }
-                            Text("Foto o CV: ${if (estado.foto != null) "Adjunta" else "Sin adjuntar"}")
+                            Text("Foto o CV: ${estado.adjunto?.nombre ?: "Sin adjuntar"}")
                         }
                     }
 
-                    if (estado.foto != null) {
-                        AsyncImage(
-                            model = estado.foto,
-                            contentDescription = "Foto adjunta",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(160.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                        )
-                    }
+                    estado.adjunto?.let { VistaPreviaAdjunto(it) }
 
                     Button(
                         onClick = {
@@ -412,6 +353,27 @@ fun VoluntariadoScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun VistaPreviaAdjunto(adjunto: Adjunto) {
+    if (adjunto.esImagen) {
+        AsyncImage(
+            model = adjunto.uri,
+            contentDescription = "Foto adjunta",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(160.dp)
+                .clip(RoundedCornerShape(12.dp))
+        )
+    } else {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Rounded.Description, contentDescription = null)
+            Spacer(Modifier.width(8.dp))
+            Text(text = adjunto.nombre, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

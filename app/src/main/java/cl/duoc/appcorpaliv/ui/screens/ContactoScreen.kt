@@ -23,7 +23,6 @@ import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -231,14 +230,7 @@ fun ContactoScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(
-                    checked = estado.aceptaContacto,
-                    onCheckedChange = colaboraViewModel::onAceptaContactoChange
-                )
-                Spacer(Modifier.width(8.dp))
-                Text("Acepto que CORPALIV me contacte")
-            }
+            OpcionCheckbox(texto = "Acepto que CORPALIV me contacte", marcado = estado.aceptaContacto, onCambio = colaboraViewModel::onAceptaContactoChange)
 
             AnimatedVisibility(visible = estado.errores.aceptaContacto != null) {
                 Text(

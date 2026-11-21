@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 @Database(
     entities = [RegistroEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDataBase : RoomDatabase() {
@@ -35,7 +35,7 @@ abstract class AppDataBase : RoomDatabase() {
                             super.onCreate(db)
                             CoroutineScope(Dispatchers.IO).launch {
                                 val dao = instance.registroDao()
-                                dao.insertarRegistro(RegistroEntity(nombre = "Javiera Soto", tipo = "Alianza inclusión laboral", estado = "Nuevo"))
+                                dao.insertarRegistro(RegistroEntity(nombre = "Javiera Soto", tipo = "Alianza inclusión laboral", estado = "Nuevo", correo = "javiera.soto@empresa.cl", detalle = "Empresa: Inclusiva SpA\nMensaje: Queremos conocer el programa de inserción laboral para 2 puestos."))
                             }
                         }
                     })

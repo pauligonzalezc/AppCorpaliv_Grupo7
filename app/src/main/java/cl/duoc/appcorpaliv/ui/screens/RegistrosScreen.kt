@@ -1,6 +1,7 @@
 package cl.duoc.appcorpaliv.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.rounded.Apartment
+import androidx.compose.material.icons.rounded.AttachFile
 import androidx.compose.material.icons.rounded.CardMembership
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Handshake
@@ -28,6 +30,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,6 +66,8 @@ fun RegistrosScreen(
     equipoViewModel : EquipoViewModel
 ) {
     val listaRegistros by colaboraViewModel.registros.collectAsState()
+    val registrosFiltrados by colaboraViewModel.registrosFiltrados.collectAsState()
+    val filtroEstado by colaboraViewModel.filtroEstado.collectAsState()
     val sesion by equipoViewModel.estado.collectAsState()
     var registroAEliminar by remember { mutableStateOf<Registro?>(null) }
 
@@ -100,45 +105,47 @@ fun RegistrosScreen(
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // tabs: null = todos, las otras filtran por estado
+                val pestanas = listOf(
+                    null to "Todos · ${listaRegistros.size}",
+                    "Nuevo" to "Nuevos · ${listaRegistros.count { it.estado == "Nuevo" }}",
+                    "Contactado" to "Contactados · ${listaRegistros.count { it.estado == "Contactado" }}",
+                    "Cerrado" to "Cerrados · ${listaRegistros.count { it.estado == "Cerrado" }}"
+                )
+
                 Row(
                     modifier = Modifier.horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                Text(
-                    text = "Nuevos · ${listaRegistros.count { it.estado == "Nuevo" }}",
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp))
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
-                )
-                Text(
-                    text = "Contactados · ${listaRegistros.count { it.estado == "Contactado" }}",
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(8.dp))
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
-                )
-                Text(
-                    text = "Cerrados · ${listaRegistros.count { it.estado == "Cerrado" }}",
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.tertiaryContainer, RoundedCornerShape(8.dp))
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
-                )
+                    pestanas.forEach { (estado, texto) ->
+                        FilterChip(
+                            selected = filtroEstado == estado,
+                            onClick = { colaboraViewModel.onFiltroEstadoChange(estado) },
+                            label = { Text(texto) }
+                        )
+                    }
                 }
 
-                if (listaRegistros.isEmpty()) {
-                    Text(text = "Todavía no hay registros", modifier = Modifier.padding(vertical = 24.dp))
+                if (registrosFiltrados.isEmpty()) {
+                    Text(
+                        text = if (listaRegistros.isEmpty()) "Todavía no hay registros" else "No hay registros en esta pestaña",
+                        modifier = Modifier.padding(vertical = 24.dp)
+                    )
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(listaRegistros, key = { it.id }) { registro ->
+                        items(registrosFiltrados, key = { it.id }) { registro ->
                             var menuAbierto by remember { mutableStateOf(false) }
 
                             Card(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        colaboraViewModel.seleccionarRegistro(registro)
+                                        viewModel.navigateTo(Screen.RegistroDetalle)
+                                    },
                                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
                             ) {
                                 Row(
@@ -171,7 +178,18 @@ fun RegistrosScreen(
                                     ) {
                                         Text(text = registro.nombre, style = MaterialTheme.typography.titleSmall)
                                         Text(text = registro.tipo, style = MaterialTheme.typography.bodySmall)
-                                        Text(text = "N° ${registro.id}", style = MaterialTheme.typography.labelSmall)
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(text = "N° ${registro.id}", style = MaterialTheme.typography.labelSmall)
+                                            if (registro.adjunto != null) {
+                                                Icon(
+                                                    Icons.Rounded.AttachFile,
+                                                    contentDescription = "Tiene adjunto",
+                                                    modifier = Modifier
+                                                        .padding(start = 6.dp)
+                                                        .size(14.dp)
+                                                )
+                                            }
+                                        }
                                     }
 
                                     Text(
