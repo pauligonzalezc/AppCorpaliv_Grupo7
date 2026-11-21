@@ -148,7 +148,7 @@ fun DonacionScreen(
             OutlinedTextField(
                 value = estado.monto,
                 onValueChange = colaboraViewModel::onMontoChange,
-                label = { Text("Otro monto (CLP, mínimo $2.000)") },
+                label = { Text("Ingresa monto a donar") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 leadingIcon = { Icon(Icons.Rounded.Payments, contentDescription = null) },

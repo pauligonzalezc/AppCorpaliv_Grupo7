@@ -6,8 +6,8 @@ La app reúne en un solo lugar el propósito de CORPALIV, sus programas, su impa
 
 ## Integrantes
 
-- Nombre Apellido
-- Nombre Apellido
+- Paulina Gonzalez
+- Marcelo Martabit
 
 ## Funcionalidades
 

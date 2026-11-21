@@ -68,8 +68,8 @@ class ColaboraViewModel(
     fun validarDonacion(): Boolean {
         val estadoActual = _donacion.value
         val errores = DonacionErrores(
-            monto = if ((estadoActual.monto.toIntOrNull() ?: 0) < 2000) "Mínimo $2.000" else null,
-            nombre = if (estadoActual.nombre.isBlank()) "Campo obligatorio" else null,
+            monto = if ((estadoActual.monto.toIntOrNull() ?: 0) < 2000) "Monto mínimo $2.000" else null,
+            nombre = if (estadoActual.nombre.isBlank()) "El nombre es obligatorio" else null,
             correo = if (!estadoActual.correo.matches(regexCorreo)) "Correo inválido, por ejemplo: nombre@correo.cl" else null
         )
 
@@ -136,9 +136,9 @@ class ColaboraViewModel(
     fun validarVoluntariado(): Boolean {
         val estadoActual = _voluntariado.value
         val errores = VoluntariadoErrores(
-            nombre = if (estadoActual.nombre.isBlank()) "Campo obligatorio" else null,
+            nombre = if (estadoActual.nombre.isBlank()) "El nombre es obligatorio" else null,
             telefono = if (estadoActual.telefono.length != 9) "Debe tener 9 dígitos después de +56" else null,
-            comuna = if (estadoActual.comuna.isBlank()) "Campo obligatorio" else null
+            comuna = if (estadoActual.comuna.isBlank()) "La comuna es obligatoria" else null
         )
 
         val hayErrores = listOfNotNull(
@@ -184,7 +184,7 @@ class ColaboraViewModel(
     fun validarContacto(): Boolean {
         val estadoActual = _contacto.value
         val errores = ContactoErrores(
-            nombre = if (estadoActual.nombre.isBlank()) "Campo obligatorio" else null,
+            nombre = if (estadoActual.nombre.isBlank()) "El nombre es obligatorio" else null,
             correo = if (!estadoActual.correo.matches(regexCorreo)) "Correo inválido, por ejemplo: nombre@correo.cl" else null,
             mensaje = if (estadoActual.mensaje.length < 20) "Escribe al menos 20 caracteres (llevas ${estadoActual.mensaje.length})" else null,
             aceptaContacto = if (!estadoActual.aceptaContacto) "Debes aceptar para continuar" else null
