@@ -2,4 +2,13 @@
 <resources>
 
     <style name="Theme.AppCorpaliv_Grupo7" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- Color de fondo -->
+        <item name="windowSplashScreenBackground">@color/purple_40</item>
+        <!-- Ícono central (de preferencia un vector o PNG con fondo transparente) -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+        <!-- Tema al que cambia cuando la app ya cargó -->
+        <item name="postSplashScreenTheme">@style/Theme.AppCorpaliv_Grupo7</item>
+    </style>
 </resources>

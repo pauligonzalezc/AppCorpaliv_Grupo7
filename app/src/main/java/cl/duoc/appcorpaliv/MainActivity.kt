@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import cl.duoc.appcorpaliv.data.local.AppDataBase
@@ -32,7 +33,18 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splash = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        splash.setOnExitAnimationListener { splashScreenView ->
+            splashScreenView.view
+                .animate()
+                .alpha(0f)                 // fade out
+                .setDuration(400L)
+                .withEndAction { splashScreenView.remove() }
+                .start()
+        }
+
         enableEdgeToEdge()
         setContent {
             AppCorpaliv_Grupo7Theme {
