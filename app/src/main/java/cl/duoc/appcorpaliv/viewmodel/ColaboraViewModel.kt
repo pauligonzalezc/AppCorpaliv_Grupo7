@@ -13,6 +13,7 @@ import cl.duoc.appcorpaliv.model.Registro
 import cl.duoc.appcorpaliv.model.RegistroUiState
 import cl.duoc.appcorpaliv.model.VoluntariadoErrores
 import cl.duoc.appcorpaliv.model.VoluntariadoUiState
+import cl.duoc.appcorpaliv.utils.Validaciones
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -58,7 +59,11 @@ class ColaboraViewModel(
     }
 
     fun onDonanteNombreChange(valor: String) {
-        _donacion.update { it.copy(nombre = valor, errores = it.errores.copy(nombre = null)) }
+        _donacion.update { it.copy(nombre = Validaciones.filtrarNombre(valor), errores = it.errores.copy(nombre = null)) }
+    }
+
+    fun onDonanteApellidoChange(valor: String) {
+        _donacion.update { it.copy(apellido = Validaciones.filtrarNombre(valor), errores = it.errores.copy(apellido = null)) }
     }
 
     fun onDonanteCorreoChange(valor: String) {
@@ -69,20 +74,22 @@ class ColaboraViewModel(
         val estadoActual = _donacion.value
         val errores = DonacionErrores(
             monto = if ((estadoActual.monto.toIntOrNull() ?: 0) < 2000) "Monto mínimo $2.000" else null,
-            nombre = if (estadoActual.nombre.isBlank()) "El nombre es obligatorio" else null,
-            correo = if (!estadoActual.correo.matches(regexCorreo)) "Correo inválido, por ejemplo: nombre@correo.cl" else null
+            nombre = Validaciones.validarNombre(estadoActual.nombre),
+            apellido = Validaciones.validarNombre(estadoActual.apellido, "El apellido es obligatorio"),
+            correo = if (!estadoActual.correo.trim().matches(regexCorreo)) "Correo inválido, por ejemplo: nombre@correo.cl" else null
         )
 
         val hayErrores = listOfNotNull(
             errores.monto,
             errores.nombre,
+            errores.apellido,
             errores.correo
         ).isNotEmpty()
 
         _donacion.update { it.copy(errores = errores) }
 
         if (!hayErrores) {
-            guardarRegistro(estadoActual.nombre, if (estadoActual.esSocio) "Socio mensual" else "Donación única")
+            guardarRegistro(estadoActual.nombre, estadoActual.apellido, if (estadoActual.esSocio) "Socio mensual" else "Donación única")
             _donacion.value = DonacionUiState()
         }
 
@@ -90,43 +97,47 @@ class ColaboraViewModel(
     }
 
     fun onVoluntarioNombreChange(valor: String) {
-        _voluntariado.update { it.copy(nombre = valor, errores = it.errores.copy(nombre = null)) }
+        _voluntariado.update { it.copy(nombre = Validaciones.filtrarNombre(valor), errores = it.errores.copy(nombre = null)) }
+    }
+
+    fun onVoluntarioApellidoChange(valor: String) {
+        _voluntariado.update { it.copy(apellido = Validaciones.filtrarNombre(valor), errores = it.errores.copy(apellido = null)) }
     }
 
     fun onTelefonoChange(valor: String) {
-        _voluntariado.update { it.copy(telefono = valor.filter { letra -> letra.isDigit() }, errores = it.errores.copy(telefono = null)) }
+        _voluntariado.update { it.copy(telefono = valor.filter { letra -> letra.isDigit() }.take(9), errores = it.errores.copy(telefono = null)) }
     }
 
     fun onComunaChange(valor: String) {
-        _voluntariado.update { it.copy(comuna = valor, errores = it.errores.copy(comuna = null)) }
+        _voluntariado.update { it.copy(comuna = Validaciones.filtrarNombre(valor), errores = it.errores.copy(comuna = null)) }
     }
 
     fun onTalleresChange(valor: Boolean) {
-        _voluntariado.update { it.copy(talleres = valor) }
+        _voluntariado.update { it.copy(talleres = valor, errores = it.errores.copy(intereses = null)) }
     }
 
     fun onEventosChange(valor: Boolean) {
-        _voluntariado.update { it.copy(eventos = valor) }
+        _voluntariado.update { it.copy(eventos = valor, errores = it.errores.copy(intereses = null)) }
     }
 
     fun onComunicacionesChange(valor: Boolean) {
-        _voluntariado.update { it.copy(comunicaciones = valor) }
+        _voluntariado.update { it.copy(comunicaciones = valor, errores = it.errores.copy(intereses = null)) }
     }
 
     fun onMentoriaChange(valor: Boolean) {
-        _voluntariado.update { it.copy(mentoria = valor) }
+        _voluntariado.update { it.copy(mentoria = valor, errores = it.errores.copy(intereses = null)) }
     }
 
     fun onMananasChange(valor: Boolean) {
-        _voluntariado.update { it.copy(mananas = valor) }
+        _voluntariado.update { it.copy(mananas = valor, errores = it.errores.copy(disponibilidad = null)) }
     }
 
     fun onTardesChange(valor: Boolean) {
-        _voluntariado.update { it.copy(tardes = valor) }
+        _voluntariado.update { it.copy(tardes = valor, errores = it.errores.copy(disponibilidad = null)) }
     }
 
     fun onFinesDeSemanaChange(valor: Boolean) {
-        _voluntariado.update { it.copy(finesDeSemana = valor) }
+        _voluntariado.update { it.copy(finesDeSemana = valor, errores = it.errores.copy(disponibilidad = null)) }
     }
 
     fun onFotoChange(valor: Uri?) {
@@ -136,15 +147,21 @@ class ColaboraViewModel(
     fun validarVoluntariado(): Boolean {
         val estadoActual = _voluntariado.value
         val errores = VoluntariadoErrores(
-            nombre = if (estadoActual.nombre.isBlank()) "El nombre es obligatorio" else null,
+            nombre = Validaciones.validarNombre(estadoActual.nombre),
+            apellido = Validaciones.validarNombre(estadoActual.apellido, "El apellido es obligatorio"),
             telefono = if (estadoActual.telefono.length != 9) "Debe tener 9 dígitos después de +56" else null,
-            comuna = if (estadoActual.comuna.isBlank()) "La comuna es obligatoria" else null
+            comuna = Validaciones.validarNombre(estadoActual.comuna, "La comuna es obligatoria"),
+            intereses = if (!estadoActual.talleres && !estadoActual.eventos && !estadoActual.comunicaciones && !estadoActual.mentoria) "Selecciona al menos una opción" else null,
+            disponibilidad = if (!estadoActual.mananas && !estadoActual.tardes && !estadoActual.finesDeSemana) "Selecciona al menos una opción" else null
         )
 
         val hayErrores = listOfNotNull(
             errores.nombre,
+            errores.apellido,
             errores.telefono,
-            errores.comuna
+            errores.comuna,
+            errores.intereses,
+            errores.disponibilidad
         ).isNotEmpty()
 
         _voluntariado.update { it.copy(errores = errores) }
@@ -153,7 +170,7 @@ class ColaboraViewModel(
     }
 
     fun enviarVoluntariado() {
-        guardarRegistro(_voluntariado.value.nombre, "Voluntariado")
+        guardarRegistro(_voluntariado.value.nombre, _voluntariado.value.apellido, "Voluntariado")
         _voluntariado.value = VoluntariadoUiState()
     }
 
@@ -166,7 +183,11 @@ class ColaboraViewModel(
     }
 
     fun onContactoNombreChange(valor: String) {
-        _contacto.update { it.copy(nombre = valor, errores = it.errores.copy(nombre = null)) }
+        _contacto.update { it.copy(nombre = Validaciones.filtrarNombre(valor), errores = it.errores.copy(nombre = null)) }
+    }
+
+    fun onContactoApellidoChange(valor: String) {
+        _contacto.update { it.copy(apellido = Validaciones.filtrarNombre(valor), errores = it.errores.copy(apellido = null)) }
     }
 
     fun onContactoCorreoChange(valor: String) {
@@ -184,14 +205,16 @@ class ColaboraViewModel(
     fun validarContacto(): Boolean {
         val estadoActual = _contacto.value
         val errores = ContactoErrores(
-            nombre = if (estadoActual.nombre.isBlank()) "El nombre es obligatorio" else null,
-            correo = if (!estadoActual.correo.matches(regexCorreo)) "Correo inválido, por ejemplo: nombre@correo.cl" else null,
+            nombre = Validaciones.validarNombre(estadoActual.nombre),
+            apellido = Validaciones.validarNombre(estadoActual.apellido, "El apellido es obligatorio"),
+            correo = if (!estadoActual.correo.trim().matches(regexCorreo)) "Correo inválido, por ejemplo: nombre@correo.cl" else null,
             mensaje = if (estadoActual.mensaje.length < 20) "Escribe al menos 20 caracteres (llevas ${estadoActual.mensaje.length})" else null,
             aceptaContacto = if (!estadoActual.aceptaContacto) "Debes aceptar para continuar" else null
         )
 
         val hayErrores = listOfNotNull(
             errores.nombre,
+            errores.apellido,
             errores.correo,
             errores.mensaje,
             errores.aceptaContacto
@@ -200,19 +223,19 @@ class ColaboraViewModel(
         _contacto.update { it.copy(errores = errores) }
 
         if (!hayErrores) {
-            guardarRegistro(estadoActual.nombre, estadoActual.tipo)
+            guardarRegistro(estadoActual.nombre, estadoActual.apellido, estadoActual.tipo)
             _contacto.value = ContactoUiState()
         }
 
         return !hayErrores
     }
 
-    private fun guardarRegistro(nombre: String, tipo: String) {
-        _registro.value = RegistroUiState(nombre = nombre, tipo = tipo)
+    private fun guardarRegistro(nombre: String, apellido: String, tipo: String) {
+        _registro.value = RegistroUiState(nombre = nombre.trim(), tipo = tipo)
         viewModelScope.launch {
             registroRepository.insertarRegistro(
                 Registro(
-                    nombre = nombre,
+                    nombre = "${nombre.trim()} ${apellido.trim()}",
                     tipo = tipo,
                     estado = "Nuevo"
                 )

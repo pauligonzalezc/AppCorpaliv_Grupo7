@@ -35,6 +35,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -208,7 +210,9 @@ fun DonacionScreen(
             OutlinedTextField(
                 value = estado.nombre,
                 onValueChange = colaboraViewModel::onDonanteNombreChange,
-                label = { Text("Nombre") },
+                label = { Text("Nombre *") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),
                 leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
                 trailingIcon = {
                     if (estado.errores.nombre != null) {
@@ -225,9 +229,32 @@ fun DonacionScreen(
             )
 
             OutlinedTextField(
+                value = estado.apellido,
+                onValueChange = colaboraViewModel::onDonanteApellidoChange,
+                label = { Text("Apellido *") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),
+                leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
+                trailingIcon = {
+                    if (estado.errores.apellido != null) {
+                        Icon(Icons.Rounded.Error, contentDescription = "Error", tint = MaterialTheme.colorScheme.error)
+                    }
+                },
+                isError = estado.errores.apellido != null,
+                supportingText = {
+                    estado.errores.apellido?.let {
+                        Text(it, color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
                 value = estado.correo,
                 onValueChange = colaboraViewModel::onDonanteCorreoChange,
                 label = { Text("Correo electrónico") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Done),
                 leadingIcon = { Icon(Icons.Rounded.Email, contentDescription = null) },
                 trailingIcon = {
                     if (estado.errores.correo != null) {

@@ -4,6 +4,7 @@ data class ContactoUiState(
     val tipo: String = "Alianza inclusión laboral",
     val empresa: String = "",
     val nombre: String = "",
+    val apellido: String = "",
     val correo: String = "",
     val mensaje: String = "",
     val aceptaContacto: Boolean = false,

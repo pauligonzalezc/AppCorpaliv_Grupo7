@@ -38,6 +38,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -139,6 +143,8 @@ fun ContactoScreen(
                 value = estado.empresa,
                 onValueChange = colaboraViewModel::onEmpresaChange,
                 label = { Text("Empresa u organización") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),
                 leadingIcon = { Icon(Icons.Rounded.Business, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -147,6 +153,8 @@ fun ContactoScreen(
                 value = estado.nombre,
                 onValueChange = colaboraViewModel::onContactoNombreChange,
                 label = { Text("Nombre de contacto *") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),
                 leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
                 trailingIcon = {
                     if (estado.errores.nombre != null) {
@@ -163,9 +171,32 @@ fun ContactoScreen(
             )
 
             OutlinedTextField(
+                value = estado.apellido,
+                onValueChange = colaboraViewModel::onContactoApellidoChange,
+                label = { Text("Apellido de contacto *") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),
+                leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
+                trailingIcon = {
+                    if (estado.errores.apellido != null) {
+                        Icon(Icons.Rounded.Error, contentDescription = "Error", tint = MaterialTheme.colorScheme.error)
+                    }
+                },
+                isError = estado.errores.apellido != null,
+                supportingText = {
+                    estado.errores.apellido?.let {
+                        Text(it, color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
                 value = estado.correo,
                 onValueChange = colaboraViewModel::onContactoCorreoChange,
                 label = { Text("Correo *") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 leadingIcon = { Icon(Icons.Rounded.Email, contentDescription = null) },
                 trailingIcon = {
                     if (estado.errores.correo != null) {

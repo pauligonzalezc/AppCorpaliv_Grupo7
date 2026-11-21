@@ -55,6 +55,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -121,7 +123,9 @@ fun VoluntariadoScreen(
                     OutlinedTextField(
                         value = estado.nombre,
                         onValueChange = colaboraViewModel::onVoluntarioNombreChange,
-                        label = { Text("Nombre completo *") },
+                        label = { Text("Nombre *") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),
                         leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
                         trailingIcon = {
                             if (estado.errores.nombre != null) {
@@ -131,6 +135,27 @@ fun VoluntariadoScreen(
                         isError = estado.errores.nombre != null,
                         supportingText = {
                             estado.errores.nombre?.let {
+                                Text(it, color = MaterialTheme.colorScheme.error)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = estado.apellido,
+                        onValueChange = colaboraViewModel::onVoluntarioApellidoChange,
+                        label = { Text("Apellido *") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next),
+                        leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
+                        trailingIcon = {
+                            if (estado.errores.apellido != null) {
+                                Icon(Icons.Rounded.Error, contentDescription = "Error", tint = MaterialTheme.colorScheme.error)
+                            }
+                        },
+                        isError = estado.errores.apellido != null,
+                        supportingText = {
+                            estado.errores.apellido?.let {
                                 Text(it, color = MaterialTheme.colorScheme.error)
                             }
                         },
@@ -162,6 +187,8 @@ fun VoluntariadoScreen(
                         value = estado.comuna,
                         onValueChange = colaboraViewModel::onComunaChange,
                         label = { Text("Comuna *") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Done),
                         leadingIcon = { Icon(Icons.Rounded.LocationOn, contentDescription = null) },
                         trailingIcon = {
                             if (estado.errores.comuna != null) {
@@ -177,7 +204,7 @@ fun VoluntariadoScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    Text(text = "¿En qué te gustaría ayudar?", style = MaterialTheme.typography.titleMedium)
+                    Text(text = "¿En qué te gustaría ayudar? *", style = MaterialTheme.typography.titleMedium)
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(
@@ -211,7 +238,15 @@ fun VoluntariadoScreen(
                         Text("Mentoría laboral")
                     }
 
-                    Text(text = "Disponibilidad", style = MaterialTheme.typography.titleMedium)
+                    AnimatedVisibility(visible = estado.errores.intereses != null) {
+                        Text(
+                            text = estado.errores.intereses ?: "",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+
+                    Text(text = "Disponibilidad *", style = MaterialTheme.typography.titleMedium)
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(
@@ -235,6 +270,14 @@ fun VoluntariadoScreen(
                             onCheckedChange = colaboraViewModel::onFinesDeSemanaChange
                         )
                         Text("Fines de semana")
+                    }
+
+                    AnimatedVisibility(visible = estado.errores.disponibilidad != null) {
+                        Text(
+                            text = estado.errores.disponibilidad ?: "",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
 
                     Card(
@@ -316,7 +359,7 @@ fun VoluntariadoScreen(
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            Text("Nombre: ${estado.nombre}")
+                            Text("Nombre: ${estado.nombre.trim()} ${estado.apellido.trim()}")
                             Text("Teléfono: +56 ${estado.telefono}")
                             Text("Comuna: ${estado.comuna}")
                             Text("Intereses:")

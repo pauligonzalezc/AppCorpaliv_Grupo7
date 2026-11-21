@@ -5,6 +5,7 @@ data class DonacionUiState(
     val monto: String = "10000",
     val destino: String = "Taller Protegido",
     val nombre: String = "",
+    val apellido: String = "",
     val correo: String = "",
     val errores: DonacionErrores = DonacionErrores()
 )

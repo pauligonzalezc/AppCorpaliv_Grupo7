@@ -4,6 +4,7 @@ import android.net.Uri
 
 data class VoluntariadoUiState(
     val nombre: String = "",
+    val apellido: String = "",
     val telefono: String = "",
     val comuna: String = "",
     val talleres: Boolean = false,
