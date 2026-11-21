@@ -9,6 +9,7 @@ import cl.duoc.appcorpaliv.model.ContactoErrores
 import cl.duoc.appcorpaliv.model.ContactoUiState
 import cl.duoc.appcorpaliv.model.DonacionErrores
 import cl.duoc.appcorpaliv.model.DonacionUiState
+import cl.duoc.appcorpaliv.model.EnvioEstado
 import cl.duoc.appcorpaliv.model.Registro
 import cl.duoc.appcorpaliv.model.RegistroUiState
 import cl.duoc.appcorpaliv.model.VoluntariadoErrores
@@ -21,6 +22,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 
 class ColaboraViewModel(
     private val registroRepository: RegistroRepository
@@ -40,35 +44,72 @@ class ColaboraViewModel(
     private val _registro = MutableStateFlow(RegistroUiState())
     val registro: StateFlow<RegistroUiState> = _registro
 
-    val registros: StateFlow<List<Registro>> = registroRepository.registros
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+    // Registros que vienen del microservicio
+    private val _registros = MutableStateFlow<List<Registro>>(emptyList())
+    val registros: StateFlow<List<Registro>> = _registros
+
+    private val _cargandoRegistros = MutableStateFlow(false)
+    val cargandoRegistros: StateFlow<Boolean> = _cargandoRegistros
+
+    // error al cargar la lista (se muestra con botón Reintentar)
+    private val _errorRegistros = MutableStateFlow<String?>(null)
+    val errorRegistros: StateFlow<String?> = _errorRegistros
+
+    // error al cambiar estado o eliminar
+    private val _errorAccion = MutableStateFlow<String?>(null)
+    val errorAccion: StateFlow<String?> = _errorAccion
+
+    // envío de los formularios
+    private val _envio = MutableStateFlow<EnvioEstado>(EnvioEstado.Inactivo)
+    val envio: StateFlow<EnvioEstado> = _envio
 
     // null = pestaña Todos, si no -> "Nuevo", "Contactado", "Cerrado"
     private val _filtroEstado = MutableStateFlow<String?>(null)
     val filtroEstado: StateFlow<String?> = _filtroEstado
 
-    val registrosFiltrados: StateFlow<List<Registro>> = combine(registroRepository.registros, _filtroEstado) { lista, filtro ->
+    val registrosFiltrados: StateFlow<List<Registro>> = combine(_registros, _filtroEstado) { lista, filtro ->
         if (filtro == null) lista else lista.filter { it.estado == filtro }
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.Eagerly,
         initialValue = emptyList()
     )
 
     private val _registroSeleccionadoId = MutableStateFlow<Int?>(null)
 
     // se recalcula con la lista, el detalle refleja al tiro un cambio de estado
-    val registroSeleccionado: StateFlow<Registro?> = combine(registroRepository.registros, _registroSeleccionadoId) { lista, id ->
+    val registroSeleccionado: StateFlow<Registro?> = combine(_registros, _registroSeleccionadoId) { lista, id ->
         lista.firstOrNull { it.id == id }
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.Eagerly,
         initialValue = null
     )
+
+    // llama la lista al ms al reintentar y abrir
+    fun cargarRegistros() {
+        viewModelScope.launch {
+            _cargandoRegistros.value = true
+            _errorRegistros.value = null
+            try {
+                _registros.value = registroRepository.obtenerRegistros()
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                _errorRegistros.value = mensajeDeError(e)
+            } finally {
+                _cargandoRegistros.value = false
+            }
+        }
+    }
+
+    fun limpiarErrorAccion() {
+        _errorAccion.value = null
+    }
+
+    // despues de la confirmacjkn o el error de envio
+    fun limpiarEnvio() {
+        _envio.value = EnvioEstado.Inactivo
+    }
 
     fun onFiltroEstadoChange(estado: String?) {
         _filtroEstado.value = estado
@@ -129,9 +170,9 @@ class ColaboraViewModel(
                 detalle = listOf(
                     "Monto: $${estadoActual.monto}${if (estadoActual.esSocio) " al mes" else ""}",
                     "Destino: ${estadoActual.destino}"
-                ).joinToString("\n")
+                ).joinToString("\n"),
+                alEnviar = { _donacion.value = DonacionUiState() }
             )
-            _donacion.value = DonacionUiState()
         }
 
         return !hayErrores
@@ -233,9 +274,9 @@ class ColaboraViewModel(
                 "Intereses: ${intereses.joinToString(", ")}",
                 "Disponibilidad: ${disponibilidad.joinToString(", ")}"
             ).joinToString("\n"),
-            adjunto = estadoActual.adjunto
+            adjunto = estadoActual.adjunto,
+            alEnviar = { _voluntariado.value = VoluntariadoUiState() }
         )
-        _voluntariado.value = VoluntariadoUiState()
     }
 
     fun onTipoChange(valor: String) {
@@ -295,14 +336,15 @@ class ColaboraViewModel(
                 detalle = listOfNotNull(
                     estadoActual.empresa.trim().takeIf { it.isNotEmpty() }?.let { "Empresa: $it" },
                     "Mensaje: ${estadoActual.mensaje.trim()}"
-                ).joinToString("\n")
+                ).joinToString("\n"),
+                alEnviar = { _contacto.value = ContactoUiState() }
             )
-            _contacto.value = ContactoUiState()
         }
 
         return !hayErrores
     }
 
+    // envio del registro , se limpia -> confirmación solo esta ok
     private fun guardarRegistro(
         nombre: String,
         apellido: String,
@@ -310,33 +352,70 @@ class ColaboraViewModel(
         correo: String = "",
         telefono: String = "",
         detalle: String = "",
-        adjunto: Adjunto? = null
+        adjunto: Adjunto? = null,
+        alEnviar: () -> Unit = {}
     ) {
-        _registro.value = RegistroUiState(nombre = nombre.trim(), tipo = tipo)
+        if (_envio.value == EnvioEstado.Enviando) return
+        _envio.value = EnvioEstado.Enviando
         viewModelScope.launch {
-            registroRepository.insertarRegistro(
-                Registro(
-                    nombre = "${nombre.trim()} ${apellido.trim()}",
-                    tipo = tipo,
-                    estado = "Nuevo",
-                    correo = correo,
-                    telefono = telefono,
-                    detalle = detalle,
-                    adjunto = adjunto
+            try {
+                val creado = registroRepository.crearRegistro(
+                    Registro(
+                        nombre = "${nombre.trim()} ${apellido.trim()}",
+                        tipo = tipo,
+                        estado = "Nuevo",
+                        correo = correo,
+                        telefono = telefono,
+                        detalle = detalle,
+                        adjunto = adjunto
+                    )
                 )
-            )
+                _registros.update { listOf(creado) + it }
+                _registro.value = RegistroUiState(nombre = nombre.trim(), tipo = tipo)
+                alEnviar()
+                _envio.value = EnvioEstado.Enviado
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                _envio.value = EnvioEstado.Error(mensajeDeError(e))
+            }
         }
     }
 
     fun cambiarEstado(registro: Registro, nuevoEstado: String) {
+        if (registro.estado == nuevoEstado) return
+        _errorAccion.value = null
         viewModelScope.launch {
-            registroRepository.actualizarRegistro(registro.copy(estado = nuevoEstado))
+            try {
+                val actualizado = registroRepository.actualizarRegistro(registro.copy(estado = nuevoEstado))
+                _registros.update { lista -> lista.map { if (it.id == actualizado.id) actualizado else it } }
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                _errorAccion.value = "No se pudo cambiar el estado. ${mensajeDeError(e)}"
+            }
         }
     }
 
-    fun eliminarRegistro(registro: Registro) {
+    // elimina en el servidor
+    fun eliminarRegistro(registro: Registro, alEliminar: () -> Unit = {}) {
+        _errorAccion.value = null
         viewModelScope.launch {
-            registroRepository.eliminarRegistro(registro)
+            try {
+                registroRepository.eliminarRegistro(registro)
+                _registros.update { lista -> lista.filterNot { it.id == registro.id } }
+                alEliminar()
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                _errorAccion.value = "No se pudo eliminar. ${mensajeDeError(e)}"
+            }
+        }
+    }
+
+    private fun mensajeDeError(e: Exception): String {
+        println("Error al comunicarse con el microservicio: $e")
+        return when (e) {
+            is IOException -> "No se pudo conectar con el servidor. Revisa tu conexión e intenta de nuevo."
+            is HttpException -> "El servidor respondió con un error (${e.code()}). Intenta de nuevo."
+            else -> "Ocurrió un error inesperado. Intenta de nuevo."
         }
     }
 

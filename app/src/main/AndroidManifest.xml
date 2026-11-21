@@ -2,14 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Cámara propia de la app (CameraX); se pide el permiso en tiempo de ejecución -->
+    <!-- camara de la app pide el permiso -->
     <uses-feature
         android:name="android.hardware.camera.any"
         android:required="false" />
 
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <!-- conexion con registros -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- el microservicio corre en local -->
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
+
     <application
+        android:networkSecurityConfig="@xml/network_security_config"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"

@@ -81,6 +81,7 @@ fun RegistroDetalleScreen(
 ) {
     val registro by colaboraViewModel.registroSeleccionado.collectAsState()
     val sesion by equipoViewModel.estado.collectAsState()
+    val errorAccion by colaboraViewModel.errorAccion.collectAsState()
     var confirmarEliminar by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -185,6 +186,10 @@ fun RegistroDetalleScreen(
                 VistaAdjunto(adjunto)
             }
 
+            errorAccion?.let { mensaje ->
+                Text(text = mensaje, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+            }
+
             OutlinedButton(
                 onClick = { confirmarEliminar = true },
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
@@ -204,8 +209,7 @@ fun RegistroDetalleScreen(
                 confirmButton = {
                     TextButton(onClick = {
                         confirmarEliminar = false
-                        colaboraViewModel.eliminarRegistro(actual)
-                        viewModel.navigateBack()
+                        colaboraViewModel.eliminarRegistro(actual) { viewModel.navigateBack() }
                     }) {
                         Text("Eliminar", color = MaterialTheme.colorScheme.error)
                     }

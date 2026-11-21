@@ -44,6 +44,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import cl.duoc.appcorpaliv.model.EnvioEstado
 import cl.duoc.appcorpaliv.navigation.Screen
 import cl.duoc.appcorpaliv.viewmodel.ColaboraViewModel
 import cl.duoc.appcorpaliv.viewmodel.MainViewModel
@@ -56,6 +57,8 @@ fun ContactoScreen(
     colaboraViewModel : ColaboraViewModel
 ) {
     val estado by colaboraViewModel.contacto.collectAsState()
+    val envio by colaboraViewModel.envio.collectAsState()
+    EfectosEnvio(colaboraViewModel) { viewModel.navigateTo(Screen.Confirmacion) }
 
     Scaffold(
         topBar = {
@@ -242,17 +245,14 @@ fun ContactoScreen(
 
             Spacer(Modifier.height(4.dp))
 
+            ErrorEnvio(envio)
+
             Button(
-                onClick = {
-                    if (colaboraViewModel.validarContacto()) {
-                        viewModel.navigateTo(Screen.Confirmacion)
-                    }
-                },
+                onClick = { colaboraViewModel.validarContacto() },
+                enabled = envio != EnvioEstado.Enviando,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(Icons.AutoMirrored.Rounded.Send, contentDescription = null)
-                Spacer(Modifier.width(ButtonDefaults.IconSpacing))
-                Text("Enviar")
+                ContenidoBotonEnvio(envio, "Enviar", Icons.AutoMirrored.Rounded.Send)
             }
         }
     }

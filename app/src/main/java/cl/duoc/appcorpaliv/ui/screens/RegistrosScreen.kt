@@ -19,12 +19,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.rounded.Apartment
+import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.AttachFile
 import androidx.compose.material.icons.rounded.CardMembership
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Handshake
 import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -40,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -69,7 +74,14 @@ fun RegistrosScreen(
     val registrosFiltrados by colaboraViewModel.registrosFiltrados.collectAsState()
     val filtroEstado by colaboraViewModel.filtroEstado.collectAsState()
     val sesion by equipoViewModel.estado.collectAsState()
+    val cargando by colaboraViewModel.cargandoRegistros.collectAsState()
+    val errorCarga by colaboraViewModel.errorRegistros.collectAsState()
+    val errorAccion by colaboraViewModel.errorAccion.collectAsState()
     var registroAEliminar by remember { mutableStateOf<Registro?>(null) }
+
+    LaunchedEffect(sesion.sesionIniciada) {
+        if (sesion.sesionIniciada) colaboraViewModel.cargarRegistros()
+    }
 
     Scaffold(
         topBar = {
@@ -80,6 +92,8 @@ fun RegistrosScreen(
                     { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Volver") }
                 },
                 actions = {
+                    IconButton(onClick = { colaboraViewModel.cargarRegistros() }, enabled = !cargando)
+                    { Icon(Icons.Rounded.Refresh, contentDescription = "Actualizar") }
                     IconButton(onClick = {
                         equipoViewModel.cerrarSesion()
                         viewModel.navigateTo(Screen.Home, popUpTo = Screen.Home, inclusive = true)
@@ -126,7 +140,53 @@ fun RegistrosScreen(
                     }
                 }
 
-                if (registrosFiltrados.isEmpty()) {
+
+                if (errorCarga != null && listaRegistros.isNotEmpty()) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = errorCarga ?: "",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        TextButton(onClick = { colaboraViewModel.cargarRegistros() }) { Text("Reintentar") }
+                    }
+                }
+
+                errorAccion?.let { mensaje ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = mensaje,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        TextButton(onClick = { colaboraViewModel.limpiarErrorAccion() }) { Text("Ok") }
+                    }
+                }
+
+                if (cargando && listaRegistros.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 48.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else if (errorCarga != null && listaRegistros.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(Icons.Rounded.CloudOff, contentDescription = null, modifier = Modifier.size(48.dp))
+                        Text(text = errorCarga ?: "", style = MaterialTheme.typography.bodyMedium)
+                        Button(onClick = { colaboraViewModel.cargarRegistros() }) { Text("Reintentar") }
+                    }
+                } else if (registrosFiltrados.isEmpty()) {
                     Text(
                         text = if (listaRegistros.isEmpty()) "Todavía no hay registros" else "No hay registros en esta pestaña",
                         modifier = Modifier.padding(vertical = 24.dp)

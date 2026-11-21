@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import cl.duoc.appcorpaliv.model.Adjunto
+import cl.duoc.appcorpaliv.model.EnvioEstado
 import cl.duoc.appcorpaliv.navigation.Screen
 import cl.duoc.appcorpaliv.utils.ArchivosAdjuntos
 import cl.duoc.appcorpaliv.viewmodel.ColaboraViewModel
@@ -75,6 +76,8 @@ fun VoluntariadoScreen(
     colaboraViewModel : ColaboraViewModel
 ) {
     val estado by colaboraViewModel.voluntariado.collectAsState()
+    val envio by colaboraViewModel.envio.collectAsState()
+    EfectosEnvio(colaboraViewModel) { viewModel.navigateTo(Screen.Confirmacion) }
     var paso by rememberSaveable { mutableStateOf(1) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -342,14 +345,14 @@ fun VoluntariadoScreen(
 
                     estado.adjunto?.let { VistaPreviaAdjunto(it) }
 
+                    ErrorEnvio(envio)
+
                     Button(
-                        onClick = {
-                            colaboraViewModel.enviarVoluntariado()
-                            viewModel.navigateTo(Screen.Confirmacion)
-                        },
+                        onClick = { colaboraViewModel.enviarVoluntariado() },
+                        enabled = envio != EnvioEstado.Enviando,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Enviar")
+                        ContenidoBotonEnvio(envio, "Enviar")
                     }
                 }
             }

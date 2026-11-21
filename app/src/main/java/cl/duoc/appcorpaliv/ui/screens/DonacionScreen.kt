@@ -40,6 +40,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import cl.duoc.appcorpaliv.model.EnvioEstado
 import cl.duoc.appcorpaliv.navigation.Screen
 import cl.duoc.appcorpaliv.viewmodel.ColaboraViewModel
 import cl.duoc.appcorpaliv.viewmodel.MainViewModel
@@ -52,6 +53,8 @@ fun DonacionScreen(
     colaboraViewModel : ColaboraViewModel
 ) {
     val estado by colaboraViewModel.donacion.collectAsState()
+    val envio by colaboraViewModel.envio.collectAsState()
+    EfectosEnvio(colaboraViewModel) { viewModel.navigateTo(Screen.Confirmacion) }
     val colorImpacto by animateColorAsState(
         targetValue = if (estado.esSocio) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.tertiaryContainer,
         animationSpec = tween(durationMillis = 500),
@@ -281,15 +284,14 @@ fun DonacionScreen(
                 )
             }
 
+            ErrorEnvio(envio)
+
             Button(
-                onClick = {
-                    if (colaboraViewModel.validarDonacion()) {
-                        viewModel.navigateTo(Screen.Confirmacion)
-                    }
-                },
+                onClick = { colaboraViewModel.validarDonacion() },
+                enabled = envio != EnvioEstado.Enviando,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Continuar al pago")
+                ContenidoBotonEnvio(envio, "Continuar al pago")
             }
         }
     }
