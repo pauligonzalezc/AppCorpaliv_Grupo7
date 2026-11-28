@@ -24,18 +24,22 @@ import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.Apartment
 import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.CardMembership
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Event
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Handshake
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +49,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -83,6 +88,11 @@ fun RegistroDetalleScreen(
     val sesion by equipoViewModel.estado.collectAsState()
     val errorAccion by colaboraViewModel.errorAccion.collectAsState()
     var confirmarEliminar by remember { mutableStateOf(false) }
+    var menuAbierto by remember { mutableStateOf(false) }
+    var estadoPorConfirmar by remember { mutableStateOf<String?>(null) }
+
+   
+    LaunchedEffect(Unit) { colaboraViewModel.limpiarErrorAccion() }
 
     Scaffold(
         topBar = {
@@ -141,17 +151,59 @@ fun RegistroDetalleScreen(
                 }
             }
 
-            // e3stado
+           
 
-            Text(text = "Estado", style = MaterialTheme.typography.titleSmall)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("Nuevo", "Contactado", "Cerrado").forEach { estado ->
-                    FilterChip(
-                        selected = actual.estado == estado,
-                        onClick = { colaboraViewModel.cambiarEstado(actual, estado) },
-                        label = { Text(estado) }
-                    )
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+            ) {
+                Row(
+                    modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "Estado:", style = MaterialTheme.typography.titleSmall)
+                    Spacer(Modifier.width(8.dp))
+                    EtiquetaEstado(actual.estado)
+                    Spacer(Modifier.weight(1f))
+
+                    Box {
+                        IconButton(onClick = { menuAbierto = true }) {
+                            Icon(Icons.Rounded.MoreVert, contentDescription = "Opciones del registro")
+                        }
+                        DropdownMenu(
+                            expanded = menuAbierto,
+                            onDismissRequest = { menuAbierto = false }
+                        ) {
+                            listOf("Nuevo", "Contactado", "Cerrado").forEach { estado ->
+                                DropdownMenuItem(
+                                    text = { Text("Marcar como $estado") },
+                                    leadingIcon = {
+                                        if (actual.estado == estado) Icon(Icons.Rounded.Check, contentDescription = "Estado actual")
+                                    },
+                                    onClick = {
+                                        menuAbierto = false
+                                        if (actual.estado != estado) estadoPorConfirmar = estado
+                                    }
+                                )
+                            }
+                            HorizontalDivider()
+                            DropdownMenuItem(
+                                text = { Text("Eliminar registro", color = MaterialTheme.colorScheme.error) },
+                                leadingIcon = {
+                                    Icon(Icons.Rounded.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                                },
+                                onClick = {
+                                    menuAbierto = false
+                                    confirmarEliminar = true
+                                }
+                            )
+                        }
+                    }
                 }
+            }
+
+            errorAccion?.let { mensaje ->
+                Text(text = mensaje, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
             }
 
             // datos de contacto
@@ -185,20 +237,23 @@ fun RegistroDetalleScreen(
             } else {
                 VistaAdjunto(adjunto)
             }
+        }
 
-            errorAccion?.let { mensaje ->
-                Text(text = mensaje, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
-            }
-
-            OutlinedButton(
-                onClick = { confirmarEliminar = true },
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(Icons.Rounded.Delete, contentDescription = null)
-                Spacer(Modifier.width(ButtonDefaults.IconSpacing))
-                Text("Eliminar registro")
-            }
+        estadoPorConfirmar?.let { nuevoEstado ->
+            AlertDialog(
+                onDismissRequest = { estadoPorConfirmar = null },
+                title = { Text("Cambiar estado") },
+                text = { Text("¿Quieres cambiar el estado de ${actual.nombre} de ${actual.estado} a $nuevoEstado?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        estadoPorConfirmar = null
+                        colaboraViewModel.cambiarEstado(actual, nuevoEstado)
+                    }) { Text("Cambiar") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { estadoPorConfirmar = null }) { Text("Cancelar") }
+                }
+            )
         }
 
         if (confirmarEliminar) {

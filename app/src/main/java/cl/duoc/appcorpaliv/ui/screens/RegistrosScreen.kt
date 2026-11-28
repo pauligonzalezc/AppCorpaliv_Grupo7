@@ -24,18 +24,13 @@ import androidx.compose.material.icons.rounded.AttachFile
 import androidx.compose.material.icons.rounded.CardMembership
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Handshake
-import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,16 +42,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import cl.duoc.appcorpaliv.model.Registro
 import cl.duoc.appcorpaliv.navigation.Screen
 import cl.duoc.appcorpaliv.viewmodel.ColaboraViewModel
 import cl.duoc.appcorpaliv.viewmodel.EquipoViewModel
@@ -76,8 +67,6 @@ fun RegistrosScreen(
     val sesion by equipoViewModel.estado.collectAsState()
     val cargando by colaboraViewModel.cargandoRegistros.collectAsState()
     val errorCarga by colaboraViewModel.errorRegistros.collectAsState()
-    val errorAccion by colaboraViewModel.errorAccion.collectAsState()
-    var registroAEliminar by remember { mutableStateOf<Registro?>(null) }
 
     LaunchedEffect(sesion.sesionIniciada) {
         if (sesion.sesionIniciada) colaboraViewModel.cargarRegistros()
@@ -153,18 +142,6 @@ fun RegistrosScreen(
                     }
                 }
 
-                errorAccion?.let { mensaje ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = mensaje,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.weight(1f)
-                        )
-                        TextButton(onClick = { colaboraViewModel.limpiarErrorAccion() }) { Text("Ok") }
-                    }
-                }
-
                 if (cargando && listaRegistros.isEmpty()) {
                     Box(
                         modifier = Modifier
@@ -197,8 +174,6 @@ fun RegistrosScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(registrosFiltrados, key = { it.id }) { registro ->
-                            var menuAbierto by remember { mutableStateOf(false) }
-
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -209,7 +184,7 @@ fun RegistrosScreen(
                                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(start = 12.dp, top = 12.dp, bottom = 12.dp),
+                                    modifier = Modifier.padding(12.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Box(
@@ -252,60 +227,7 @@ fun RegistrosScreen(
                                         }
                                     }
 
-                                    Text(
-                                        text = registro.estado,
-                                        style = MaterialTheme.typography.labelMedium,
-                                        modifier = Modifier
-                                            .background(
-                                                when (registro.estado) {
-                                                    "Contactado" -> MaterialTheme.colorScheme.secondaryContainer
-                                                    "Cerrado" -> MaterialTheme.colorScheme.tertiaryContainer
-                                                    else -> MaterialTheme.colorScheme.primaryContainer
-                                                },
-                                                RoundedCornerShape(8.dp)
-                                            )
-                                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                                    )
-
-                                    Box {
-                                        IconButton(onClick = { menuAbierto = true }) {
-                                            Icon(Icons.Rounded.MoreVert, contentDescription = "Opciones del registro")
-                                        }
-                                        DropdownMenu(
-                                            expanded = menuAbierto,
-                                            onDismissRequest = { menuAbierto = false }
-                                        ) {
-                                            DropdownMenuItem(
-                                                text = { Text("Marcar como Nuevo") },
-                                                onClick = {
-                                                    colaboraViewModel.cambiarEstado(registro, "Nuevo")
-                                                    menuAbierto = false
-                                                }
-                                            )
-                                            DropdownMenuItem(
-                                                text = { Text("Marcar como Contactado") },
-                                                onClick = {
-                                                    colaboraViewModel.cambiarEstado(registro, "Contactado")
-                                                    menuAbierto = false
-                                                }
-                                            )
-                                            DropdownMenuItem(
-                                                text = { Text("Marcar como Cerrado") },
-                                                onClick = {
-                                                    colaboraViewModel.cambiarEstado(registro, "Cerrado")
-                                                    menuAbierto = false
-                                                }
-                                            )
-                                            HorizontalDivider()
-                                            DropdownMenuItem(
-                                                text = { Text("Eliminar", color = MaterialTheme.colorScheme.error) },
-                                                onClick = {
-                                                    registroAEliminar = registro
-                                                    menuAbierto = false
-                                                }
-                                            )
-                                        }
-                                    }
+                                    EtiquetaEstado(registro.estado)
                                 }
                             }
                         }
@@ -314,25 +236,23 @@ fun RegistrosScreen(
             }
         }
     }
+}
 
-    registroAEliminar?.let { registro ->
-        AlertDialog(
-            onDismissRequest = { registroAEliminar = null },
-            title = { Text("Eliminar registro") },
-            text = { Text("¿Seguro que quieres eliminar el registro de ${registro.nombre}? Esta acción no se puede deshacer.") },
-            confirmButton = {
-                TextButton(onClick = {
-                    colaboraViewModel.eliminarRegistro(registro)
-                    registroAEliminar = null
-                }) {
-                    Text("Eliminar", color = MaterialTheme.colorScheme.error)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { registroAEliminar = null }) {
-                    Text("Cancelar")
-                }
-            }
-        )
-    }
+// etiqueta de color del estado, se usa en el listado y en el detalle
+@Composable
+fun EtiquetaEstado(estado: String) {
+    Text(
+        text = estado,
+        style = MaterialTheme.typography.labelMedium,
+        modifier = Modifier
+            .background(
+                when (estado) {
+                    "Contactado" -> MaterialTheme.colorScheme.secondaryContainer
+                    "Cerrado" -> MaterialTheme.colorScheme.tertiaryContainer
+                    else -> MaterialTheme.colorScheme.primaryContainer
+                },
+                RoundedCornerShape(8.dp)
+            )
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    )
 }
