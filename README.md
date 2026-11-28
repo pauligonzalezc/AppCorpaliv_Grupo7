@@ -78,10 +78,6 @@ Ejemplo de cuerpo para POST y PUT:
 
 El adjunto (foto o PDF) queda guardado en el teléfono que envió el registro; el microservicio solo guarda su ubicación, tipo y nombre. Más detalles en [backend/registros-service/README.md](backend/registros-service/README.md).
 
-### API externa
-
-Pendiente.
-
 ## Pasos para ejecutar
 
 ### 1. Base de datos (MySQL)
