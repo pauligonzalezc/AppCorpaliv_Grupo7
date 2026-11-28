@@ -179,5 +179,3 @@ Pasos en Android Studio:
 2. Crear la llave (**Create new…**) o elegir una existente: ruta del `.jks`, contraseña, alias y contraseña de la llave.
 3. Elegir la variante **release** y presionar **Create**.
 4. El APK queda en `app/release/app-release.apk`.
-
-Pendiente: captura del APK firmado y de la llave `.jks`.
