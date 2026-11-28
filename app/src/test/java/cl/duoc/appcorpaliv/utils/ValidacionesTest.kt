@@ -1,49 +1,42 @@
 package cl.duoc.appcorpaliv.utils
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Test
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 
-class ValidacionesTest {
+class ValidacionesTest : StringSpec({
 
-    @Test
-    fun filtrarNombre_quitaNumerosSimbolosYSaltosDeLinea() {
-        assertEquals("Juan", Validaciones.filtrarNombre("Ju4an\n#"))
-        assertEquals("AnaMaria", Validaciones.filtrarNombre("Ana\nMaria"))
+    "filtrarNombre quita números, símbolos y saltos de línea" {
+        Validaciones.filtrarNombre("Ju4an\n#") shouldBe "Juan"
+        Validaciones.filtrarNombre("Ana\nMaria") shouldBe "AnaMaria"
     }
 
-    @Test
-    fun filtrarNombre_permiteApostrofeYGuion() {
-        assertEquals("O'Higgins", Validaciones.filtrarNombre("O'Higgins"))
-        assertEquals("O'Higgins", Validaciones.filtrarNombre("O’Higgins"))
-        assertEquals("Pérez-Cotapos", Validaciones.filtrarNombre("Pérez-Cotapos"))
+    "filtrarNombre permite apóstrofe y guion" {
+        Validaciones.filtrarNombre("O'Higgins") shouldBe "O'Higgins"
+        Validaciones.filtrarNombre("O’Higgins") shouldBe "O'Higgins"
+        Validaciones.filtrarNombre("Pérez-Cotapos") shouldBe "Pérez-Cotapos"
     }
 
-    @Test
-    fun filtrarNombre_noPermiteSeparadoresAlInicioNiRepetidos() {
-        assertEquals("Ana Luz", Validaciones.filtrarNombre("  Ana  Luz"))
-        assertEquals("Ana-Luz", Validaciones.filtrarNombre("-Ana--Luz"))
+    "filtrarNombre no permite separadores al inicio ni repetidos" {
+        Validaciones.filtrarNombre("  Ana  Luz") shouldBe "Ana Luz"
+        Validaciones.filtrarNombre("-Ana--Luz") shouldBe "Ana-Luz"
     }
 
-    @Test
-    fun filtrarNombre_cortaEnLargoMaximo() {
-        assertEquals(Validaciones.LARGO_MAXIMO_NOMBRE, Validaciones.filtrarNombre("a".repeat(100)).length)
+    "filtrarNombre corta en el largo máximo" {
+        Validaciones.filtrarNombre("a".repeat(100)).length shouldBe Validaciones.LARGO_MAXIMO_NOMBRE
     }
 
-    @Test
-    fun validarNombre_aceptaNombresValidos() {
-        assertNull(Validaciones.validarNombre("Paulina"))
-        assertNull(Validaciones.validarNombre("María José "))
-        assertNull(Validaciones.validarNombre("D'Angelo"))
-        assertNull(Validaciones.validarNombre("Gonzalez-Castro"))
+    "validarNombre acepta nombres válidos" {
+        Validaciones.validarNombre("Paulina") shouldBe null
+        Validaciones.validarNombre("María José ") shouldBe null
+        Validaciones.validarNombre("D'Angelo") shouldBe null
+        Validaciones.validarNombre("Gonzalez-Castro") shouldBe null
     }
 
-    @Test
-    fun validarNombre_rechazaVacioCortoOTerminadoEnSeparador() {
-        assertEquals("El apellido es obligatorio", Validaciones.validarNombre("  ", "El apellido es obligatorio"))
-        assertNotNull(Validaciones.validarNombre("A"))
-        assertNotNull(Validaciones.validarNombre("Ana-"))
-        assertNotNull(Validaciones.validarNombre("Ana2"))
+    "validarNombre rechaza vacío, corto o terminado en separador" {
+        Validaciones.validarNombre("  ", "El apellido es obligatorio") shouldBe "El apellido es obligatorio"
+        Validaciones.validarNombre("A") shouldNotBe null
+        Validaciones.validarNombre("Ana-") shouldNotBe null
+        Validaciones.validarNombre("Ana2") shouldNotBe null
     }
-}
+})

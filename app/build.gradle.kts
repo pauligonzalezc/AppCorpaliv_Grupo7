@@ -20,6 +20,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            // reporte de cobertura de las pruebas unitarias
+            enableUnitTestCoverage = true
+        }
         release {
             optimization {
                 enable = false
@@ -73,6 +77,17 @@ dependencies {
     implementation("androidx.camera:camera-camera2:1.4.2")
     implementation("androidx.camera:camera-lifecycle:1.4.2")
     implementation("androidx.camera:camera-view:1.4.2")
+
+    // Pruebas unitarias (Guía 15)
+    // Kotest
+    testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
+    testImplementation("io.kotest:kotest-assertions-core:5.8.0")
+    // JUnit 5
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    // MockK
+    testImplementation("io.mockk:mockk:1.13.10")
+    // Corrutinas en pruebas (runTest, Dispatchers.setMain)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
 //    implementation(libs.androidx.ui)
 //    implementation(libs.androidx.ui.graphics)
 //    implementation(libs.androidx.ui.tooling.preview)
@@ -81,4 +96,9 @@ dependencies {
 //    implementation(libs.androidx.navigation. compose. jvmstubs)
 //    implementation(libs.androidx.compose.material3.window.size.class1.android)
 
+}
+
+// Obligatorio para usar JUnit 5 (Guía 15)
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
