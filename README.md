@@ -169,9 +169,3 @@ Usa H2 en memoria, así que no necesita MySQL. El reporte de cobertura (JaCoCo) 
 
 El APK de publicación se firma con una llave propia (`.jks`), distinta de la llave de pruebas que Android Studio usa en debug.
 
-Pasos en Android Studio:
-
-1. **Build → Generate Signed App Bundle or APK…** → **APK**.
-2. Crear la llave (**Create new…**) o elegir una existente: ruta del `.jks`, contraseña, alias y contraseña de la llave.
-3. Elegir la variante **release** y presionar **Create**.
-4. El APK queda en `app/release/app-release.apk`.
